@@ -1,0 +1,50 @@
+{
+  "name": "@debridge-finance/desdk",
+  "version": "0.0.1",
+  "description": "DeBridge SDK",
+  "repository": "github:debridge-finance/desdk",
+  "author": "Debridge.Finance",
+  "license": "MIT",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "keywords": [
+    "bridge",
+    "deBridge"
+  ],
+  "scripts": {
+    "lint:fix": "prettier --write 'src/**/*.{js,ts}' 'test/**/*.{js,ts}' && tslint --fix --config tslint.json --project tsconfig.json",
+    "lint": "tslint --config tslint.json --project tsconfig.json",
+    "test": "mocha --exit --recursive 'test/**/*.test.ts'",
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "prepare": "npm run build"
+  },
+  "files": [
+    "build/",
+    "LICENSE",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@debridge-finance/contracts": "github:debridge-finance/debridge-contracts-v1#8c6f3845288d8e0596fb2700beb2ee2725d802fb",
+    "@nomiclabs/hardhat-ethers": "2.0.6",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "@openzeppelin/hardhat-upgrades": "^1.19.1",
+    "@typechain/ethers-v5": "^10.1.0",
+    "@typechain/hardhat": "^6.1.2",
+    "@types/chai": "^4.3.1",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^18.6.2",
+    "chai": "^4.3.6",
+    "ethereum-waffle": "^3.4.4",
+    "hardhat": "^2.10.1",
+    "prettier": "2.7.1",
+    "ts-node": "^10.9.1",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.3.0",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "ethers": "^5.6.9"
+  }
+}
