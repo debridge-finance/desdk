@@ -165,6 +165,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.CrossChainIncrementor__factory>;
     getContractFactory(
+      name: "IDeBridgeGateExtended",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IDeBridgeGateExtended__factory>;
+    getContractFactory(
       name: "ICrossChainCounter",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ICrossChainCounter__factory>;
@@ -359,6 +363,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.CrossChainIncrementor>;
+    getContractAt(
+      name: "IDeBridgeGateExtended",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IDeBridgeGateExtended>;
     getContractAt(
       name: "ICrossChainCounter",
       address: string,

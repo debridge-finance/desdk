@@ -6,9 +6,13 @@ import "@debridge-finance/contracts/contracts/interfaces/IDeBridgeGate.sol";
 
 import "./interfaces/ICrossChainCounter.sol";
 
+interface IDeBridgeGateExtended is IDeBridgeGate {
+    function globalFixedNativeFee() external returns (uint);
+}
+
 contract CrossChainIncrementor {
     /// @dev DeBridgeGate's address on the current chain
-    IDeBridgeGate public deBridgeGate;
+    IDeBridgeGateExtended public deBridgeGate;
 
     /// @dev Chain ID where the cross-chain counter contract has been deployed
     uint256 crossChainCounterResidenceChainID;
@@ -19,7 +23,7 @@ contract CrossChainIncrementor {
     /* ========== INITIALIZERS ========== */
 
     constructor(
-        IDeBridgeGate deBridgeGate_,
+        IDeBridgeGateExtended deBridgeGate_,
         uint256 crossChainCounterResidenceChainID_,
         address crossChainCounterResidenceAddress_
     ) {
@@ -34,6 +38,14 @@ contract CrossChainIncrementor {
         bytes memory dstTxCall = _encodeReceiveCommand(_amount, msg.sender);
 
         _send(dstTxCall, 0);
+    }
+
+    function incrementMulti(uint8[] memory _amounts) external payable {
+        for (uint8 i = 0; i < _amounts.length; i++) {
+            uint8 amount = _amounts[i];
+            bytes memory dstTxCall = _encodeReceiveCommand(amount, msg.sender);
+            _send(dstTxCall, 0);
+        }
     }
 
     function incrementWithIncludedGas(uint8 _amount, uint256 _executionFee) external payable {
@@ -82,9 +94,10 @@ contract CrossChainIncrementor {
         autoParams.data = _dstTransactionCall;
         autoParams.fallbackAddress = abi.encodePacked(msg.sender);
 
-        deBridgeGate.send{value: msg.value}(
+        uint fee = deBridgeGate.globalFixedNativeFee();
+        deBridgeGate.send{value: fee + _executionFee}(
             address(0), // _tokenAddress
-            msg.value, // _amount
+            _executionFee, // _amount
             crossChainCounterResidenceChainID, // _chainIdTo
             abi.encodePacked(crossChainCounterResidenceAddress), // _receiver
             "", // _permit
@@ -93,4 +106,6 @@ contract CrossChainIncrementor {
             abi.encode(autoParams) // _autoParams
         );
     }
+
+    receive() external payable {}
 }

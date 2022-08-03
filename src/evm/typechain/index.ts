@@ -82,7 +82,9 @@ export type { CrossChainCounter } from "./contracts/CrossChainCounter.sol/CrossC
 export { CrossChainCounter__factory } from "./factories/contracts/CrossChainCounter.sol/CrossChainCounter__factory";
 export type { IDebridgeGateWithCallProxyGetter } from "./contracts/CrossChainCounter.sol/IDebridgeGateWithCallProxyGetter";
 export { IDebridgeGateWithCallProxyGetter__factory } from "./factories/contracts/CrossChainCounter.sol/IDebridgeGateWithCallProxyGetter__factory";
-export type { CrossChainIncrementor } from "./contracts/CrossChainIncrementor";
-export { CrossChainIncrementor__factory } from "./factories/contracts/CrossChainIncrementor__factory";
+export type { CrossChainIncrementor } from "./contracts/CrossChainIncrementor.sol/CrossChainIncrementor";
+export { CrossChainIncrementor__factory } from "./factories/contracts/CrossChainIncrementor.sol/CrossChainIncrementor__factory";
+export type { IDeBridgeGateExtended } from "./contracts/CrossChainIncrementor.sol/IDeBridgeGateExtended";
+export { IDeBridgeGateExtended__factory } from "./factories/contracts/CrossChainIncrementor.sol/IDeBridgeGateExtended__factory";
 export type { ICrossChainCounter } from "./contracts/interfaces/ICrossChainCounter";
 export { ICrossChainCounter__factory } from "./factories/contracts/interfaces/ICrossChainCounter__factory";

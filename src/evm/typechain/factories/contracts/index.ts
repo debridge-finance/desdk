@@ -2,5 +2,5 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as crossChainCounterSol from "./CrossChainCounter.sol";
+export * as crossChainIncrementorSol from "./CrossChainIncrementor.sol";
 export * as interfaces from "./interfaces";
-export { CrossChainIncrementor__factory } from "./CrossChainIncrementor__factory";

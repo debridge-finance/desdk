@@ -3,6 +3,7 @@
 /* eslint-disable */
 import type * as crossChainCounterSol from "./CrossChainCounter.sol";
 export type { crossChainCounterSol };
+import type * as crossChainIncrementorSol from "./CrossChainIncrementor.sol";
+export type { crossChainIncrementorSol };
 import type * as interfaces from "./interfaces";
 export type { interfaces };
-export type { CrossChainIncrementor } from "./CrossChainIncrementor";

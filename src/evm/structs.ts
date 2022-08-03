@@ -1,7 +1,6 @@
 import { BigNumber } from "ethers";
 import { defaultAbiCoder, ParamType } from "ethers/lib/utils";
-import { IDeBridgeGate } from "./typechain";
-import { SentEvent } from "./typechain/@debridge-finance/contracts/contracts/interfaces/IDeBridgeGate";
+import { EVMSubmission } from "./submission";
 
 export enum Flag {
   UNWRAP_ETH = 0,
@@ -69,8 +68,6 @@ export class Flags {
   }
 }
 
-
-
 export const SubmissionAutoParamsToParam = ParamType.from({
   type: "tuple",
   name: "SubmissionAutoParamsTo",
@@ -82,29 +79,7 @@ export const SubmissionAutoParamsToParam = ParamType.from({
   ],
 });
 
-export interface ISubmissionAutoParamsTo {
-  executionFee: BigNumber;
-  flags: Flags;
-  fallbackAddress: string;
-  data: string;
-}
-
-export function parseAutoParamsTo(bytesOrEvent: string | SentEvent): ISubmissionAutoParamsTo {
-  const rawRepresentation = typeof(bytesOrEvent) === "string"
-    ? bytesOrEvent
-    : bytesOrEvent.args.autoParams;
-  const struct = defaultAbiCoder.decode([SubmissionAutoParamsToParam], rawRepresentation)[0];
-
-  return {
-    ...struct,
-    flags: new Flags(struct.flags.toNumber()),
-  };
-}
-
-
-
-
-export const SubmissionAutoParamsFrom = ParamType.from({
+export const SubmissionAutoParamsFromParam = ParamType.from({
   type: "tuple",
   name: "SubmissionAutoParamsFrom",
   components: [
@@ -116,6 +91,77 @@ export const SubmissionAutoParamsFrom = ParamType.from({
   ],
 });
 
-export interface ISubmissionAutoParamsFrom extends ISubmissionAutoParamsTo {
-  nativeSender: string;
+type TSendAutoParams = {
+  readonly executionFee: BigNumber;
+  readonly flags: Flags;
+  readonly fallbackAddress: string;
+  readonly data: string;
+}
+
+export interface SendAutoParams extends TSendAutoParams {}
+export class SendAutoParams {
+  static decode(data: string): SendAutoParams {
+    const struct = defaultAbiCoder.decode([SubmissionAutoParamsToParam], data)[0];
+
+    return new SendAutoParams({
+      ...struct,
+      flags: new Flags(struct.flags.toNumber()),
+    });
+  }
+
+  constructor(args: TSendAutoParams) {
+    Object.assign(this, args);
+  }
+
+  toString(): string {
+    return this.encode();
+  }
+
+  encode(): string {
+    return defaultAbiCoder.encode(
+      [SubmissionAutoParamsToParam],
+      [this.executionFee, this.flags.toString(), this.fallbackAddress, this.data]
+    );
+  }
+
+  toClaimAutoParams(submission: EVMSubmission): ClaimAutoParams {
+    return new ClaimAutoParams({
+      ...this,
+      nativeSender: submission.nativeSender
+    })
+  }
+}
+
+type TClaimAutoParams = {
+  readonly executionFee: BigNumber;
+  readonly flags: Flags;
+  readonly fallbackAddress: string;
+  readonly data: string;
+  readonly nativeSender: string;
+}
+export interface ClaimAutoParams extends TClaimAutoParams {}
+export class ClaimAutoParams {
+  static decode(data: string): ClaimAutoParams {
+    const struct = defaultAbiCoder.decode([SubmissionAutoParamsFromParam], data)[0];
+
+    return new ClaimAutoParams({
+      ...struct,
+      flags: new Flags(struct.flags.toNumber()),
+    });
+  }
+
+  constructor(args: TClaimAutoParams) {
+    Object.assign(this, args);
+  }
+
+  toString(): string {
+    return this.encode();
+  }
+
+  encode(): string {
+    return defaultAbiCoder.encode(
+      [SubmissionAutoParamsFromParam],
+      [[this.executionFee, this.flags.toString(), this.fallbackAddress, this.data, this.nativeSender]]
+    );
+  }
 }
