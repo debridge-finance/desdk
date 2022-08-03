@@ -14,11 +14,11 @@ const config: HardhatUserConfig = {
       allowUnlimitedContractSize: true,
     },
     bnb: {
-      url: 'https://bsc-dataseed.binance.org'
-    }
+      url: "https://bsc-dataseed.binance.org",
+    },
   },
   typechain: {
-    outDir: "./src/evm/typechain"
-  }
+    outDir: "./src/evm/typechain",
+  },
 };
 export default config;

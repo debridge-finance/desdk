@@ -1,5 +1,6 @@
 import { BigNumber } from "ethers";
 import { defaultAbiCoder, ParamType } from "ethers/lib/utils";
+
 import { EVMSubmission } from "./submission";
 
 export enum Flag {
@@ -96,12 +97,16 @@ type TSendAutoParams = {
   readonly flags: Flags;
   readonly fallbackAddress: string;
   readonly data: string;
-}
+};
 
+// tslint:disable-next-line:no-empty-interface
 export interface SendAutoParams extends TSendAutoParams {}
 export class SendAutoParams {
   static decode(data: string): SendAutoParams {
-    const struct = defaultAbiCoder.decode([SubmissionAutoParamsToParam], data)[0];
+    const struct = defaultAbiCoder.decode(
+      [SubmissionAutoParamsToParam],
+      data
+    )[0];
 
     return new SendAutoParams({
       ...struct,
@@ -120,15 +125,20 @@ export class SendAutoParams {
   encode(): string {
     return defaultAbiCoder.encode(
       [SubmissionAutoParamsToParam],
-      [this.executionFee, this.flags.toString(), this.fallbackAddress, this.data]
+      [
+        this.executionFee,
+        this.flags.toString(),
+        this.fallbackAddress,
+        this.data,
+      ]
     );
   }
 
   toClaimAutoParams(submission: EVMSubmission): ClaimAutoParams {
     return new ClaimAutoParams({
       ...this,
-      nativeSender: submission.nativeSender
-    })
+      nativeSender: submission.nativeSender,
+    });
   }
 }
 
@@ -138,11 +148,16 @@ type TClaimAutoParams = {
   readonly fallbackAddress: string;
   readonly data: string;
   readonly nativeSender: string;
-}
+};
+
+// tslint:disable-next-line:no-empty-interface
 export interface ClaimAutoParams extends TClaimAutoParams {}
 export class ClaimAutoParams {
   static decode(data: string): ClaimAutoParams {
-    const struct = defaultAbiCoder.decode([SubmissionAutoParamsFromParam], data)[0];
+    const struct = defaultAbiCoder.decode(
+      [SubmissionAutoParamsFromParam],
+      data
+    )[0];
 
     return new ClaimAutoParams({
       ...struct,
@@ -161,7 +176,15 @@ export class ClaimAutoParams {
   encode(): string {
     return defaultAbiCoder.encode(
       [SubmissionAutoParamsFromParam],
-      [[this.executionFee, this.flags.toString(), this.fallbackAddress, this.data, this.nativeSender]]
+      [
+        [
+          this.executionFee,
+          this.flags.toString(),
+          this.fallbackAddress,
+          this.data,
+          this.nativeSender,
+        ],
+      ]
     );
   }
 }

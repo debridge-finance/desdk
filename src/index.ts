@@ -1,5 +1,3 @@
-import * as evm from './evm'
+import * as evm from "./evm";
 
-export {
-    evm
-}
+export { evm };
