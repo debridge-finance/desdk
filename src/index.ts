@@ -1,3 +1,1 @@
-import * as evm from "./evm";
-
-export { evm };
+export * as evm from './evm'

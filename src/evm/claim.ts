@@ -1,7 +1,7 @@
 import { BigNumberish, BytesLike } from "ethers";
-import { EVMContext, getDeBridgeGate, getSignatureStorage } from "./context";
+import { EVMContext, getDeBridgeGate, getProvider, getSignatureStorage } from "./context";
 import { ClaimAutoParams } from "./structs";
-import { DeBridgeGate } from "./typechain";
+import { DeBridgeGate, SignatureVerifier__factory } from "./typechain";
 
 export type ClaimArgs = Parameters<DeBridgeGate["claim"]>;
 
@@ -21,11 +21,21 @@ export class EVMClaim {
         Object.assign(this, args);
     }
 
+    async requiredSignaturesCount(): Promise<number> {
+        const contract = getDeBridgeGate(this.ctx)
+        const excessConfirmations = await getDeBridgeGate(this.ctx).excessConfirmations();
+        const sv = SignatureVerifier__factory.connect(
+            await contract.signatureVerifier(),
+            getProvider(this.ctx)
+        );
+        const activityExcessConfirmations = await sv.excessConfirmations()
+        return Math.max(excessConfirmations, activityExcessConfirmations)
+    }
+
     async isSigned(): Promise<boolean> {
-      // TODO: pick minConfirmations vs excessConfirmations according to bridged amount
-      // TODO: check required validators
       const signatures = await this.getSignatures()
-      return signatures.length > 8;
+      const minRequiredSignatures = await this.requiredSignaturesCount()
+      return signatures.length >= minRequiredSignatures;
     }
 
     async isExecuted(): Promise<boolean> {
