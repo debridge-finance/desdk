@@ -1,5 +1,4 @@
-import { ethers } from "ethers";
-
+import { BytesLike, ethers } from "ethers";
 import { SubmissionStatus } from "./submission";
 
 type DeBridgeApiGetFullSubmissionInfoResponse = {
@@ -20,11 +19,11 @@ export class DeBridgeApiStatus {
 }
 
 export interface ISignatureStorage {
-  getSignatures(submissionId: string): Promise<string[]>;
+  getSignatures(submissionId: BytesLike): Promise<string[]>;
 }
 
 export class DummySignatureStorage implements ISignatureStorage {
-  async getSignatures(submissionId: string) {
+  async getSignatures(submissionId: BytesLike) {
     return ["0x1", "0x2", "0x3", "0x4", "0x5", "0x6", "0x7", "0x8"];
   }
 }
@@ -32,7 +31,7 @@ export class DummySignatureStorage implements ISignatureStorage {
 export class FixedSignatureStorage implements ISignatureStorage {
   constructor(private _signatures: string[]) {}
 
-  async getSignatures(submissionId: string) {
+  async getSignatures(submissionId: BytesLike) {
     return this._signatures;
   }
 }
@@ -40,7 +39,7 @@ export class FixedSignatureStorage implements ISignatureStorage {
 export class SignersSignatureStorage implements ISignatureStorage {
   constructor(private _signers: ethers.Signer[]) {}
 
-  async getSignatures(submissionId: string): Promise<string[]> {
+  async getSignatures(submissionId: BytesLike): Promise<string[]> {
     const signatures = [];
 
     // see the note: https://docs.ethers.io/v5/api/signer/#Signer-signMessage
@@ -57,7 +56,7 @@ export class SignersSignatureStorage implements ISignatureStorage {
 }
 
 export class IPFSSignatureStorage implements ISignatureStorage {
-  async getSignatures(submissionId: string) {
+  async getSignatures(submissionId: BytesLike) {
     throw new Error("IPFSSignatureStorage not implemented");
     return [];
   }

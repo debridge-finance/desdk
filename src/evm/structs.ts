@@ -1,6 +1,5 @@
 import { BigNumber } from "ethers";
-import { defaultAbiCoder, ParamType } from "ethers/lib/utils";
-
+import { BytesLike, defaultAbiCoder, ParamType } from "ethers/lib/utils";
 import { EVMSubmission } from "./submission";
 
 export enum Flag {
@@ -145,9 +144,9 @@ export class SendAutoParams {
 type TClaimAutoParams = {
   readonly executionFee: BigNumber;
   readonly flags: Flags;
-  readonly fallbackAddress: string;
-  readonly data: string;
-  readonly nativeSender: string;
+  readonly fallbackAddress: BytesLike;
+  readonly data: BytesLike;
+  readonly nativeSender: BytesLike;
 };
 
 // tslint:disable-next-line:no-empty-interface

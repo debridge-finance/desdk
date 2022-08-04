@@ -95,7 +95,8 @@ describe("General flow", function () {
   });
 
   it("Must claim", async function () {
-    const args = await this.submissions[0].getClaimArgs(this.evmContext);
+    const claim = await this.submissions[0].toEVMClaim(this.evmContext);
+    const args = await claim.getClaimArgs();
 
     await this.contracts.gate.claim(...args);
 
@@ -139,7 +140,8 @@ describe("General flow: multiple submissions per one txn", function () {
         await this.contracts.counter.counter()
       ).toNumber();
 
-      const args = await this.submissions[i].getClaimArgs(this.evmContext);
+      const claim = await this.submissions[i].toEVMClaim(this.evmContext);
+      const args = await claim.getClaimArgs()
 
       await this.contracts.gate.claim(...args);
 

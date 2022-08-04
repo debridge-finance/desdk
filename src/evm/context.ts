@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-
 import { DeBridgeApiSignatureStorage, ISignatureStorage } from "./connectors";
+import { DeBridgeGate, DeBridgeGate__factory } from "./typechain";
 
 const DEFAULT_DEBRIDGE_GATE_ADDRESS =
   "0x43dE2d77BF8027e25dBD179B491e8d64f38398aA";
@@ -27,6 +27,13 @@ export function getProvider(ctx: EVMContext): ethers.providers.Provider {
 
 export function getDeBridgeGateAddress(ctx: EVMContext): string {
   return ctx.deBridgeGateAddress || DEFAULT_DEBRIDGE_GATE_ADDRESS;
+}
+
+export function getDeBridgeGate(ctx: EVMContext): DeBridgeGate {
+  return DeBridgeGate__factory.connect(
+    getDeBridgeGateAddress(ctx),
+    getProvider(ctx)
+  );
 }
 
 export function getSignatureStorage(ctx: EVMContext): ISignatureStorage {

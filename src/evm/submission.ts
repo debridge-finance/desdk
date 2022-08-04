@@ -1,12 +1,10 @@
 import { deepCopy } from "ethers/lib/utils";
 
-import { ClaimArgs } from "./claim";
-import { DeBridgeApiStatus } from "./connectors";
+import { EVMClaim } from "./claim";
 import {
   EVMContext,
   getDeBridgeGateAddress,
   getProvider,
-  getSignatureStorage,
 } from "./context";
 import { SendAutoParams } from "./structs";
 import { DeBridgeGate__factory } from "./typechain";
@@ -31,61 +29,58 @@ export type TEVMSubmission = Readonly<Omit<SentEventObject, "autoParams">> & {
 export interface EVMSubmission extends TEVMSubmission {}
 export class EVMSubmission {
   static async from(txHash: string, ctx: EVMContext): Promise<EVMSubmission[]> {
-    return getSubmissions(txHash, ctx);
+    const events = await getSentEvents(txHash, ctx);
+    const originChainId = (await getProvider(ctx).getNetwork()).chainId;
+    return events.map(
+      (sentEvent: SentEvent) =>
+        new EVMSubmission({
+          ...sentEvent.args,
+          autoParams: SendAutoParams.decode(sentEvent.args.autoParams),
+          originChainId,
+          sentEvent,
+        }, ctx)
+    );
   }
 
-  constructor(args: TEVMSubmission) {
+  constructor(args: TEVMSubmission, private ctx: EVMContext) {
     Object.assign(this, args);
   }
 
-  async getStatus(ctx: EVMContext): Promise<SubmissionStatus> {
-    const api = new DeBridgeApiStatus();
-    return api.getStatus(this.submissionId);
+  async isConfirmed(overrideBlockConfirmations?: number): Promise<boolean> {
+    const requiredConfirmations = overrideBlockConfirmations === undefined
+      ? await this._getRequiredConfirmations()
+      : overrideBlockConfirmations;
+
+    const currentBlockNumber = await getProvider(this.ctx).getBlockNumber();
+    if (this.sentEvent.blockNumber + requiredConfirmations <= currentBlockNumber) {
+      return true;
+    }
+
+    return false;
   }
 
-  async getSignatures(ctx: EVMContext): Promise<string[]> {
-    const storage = getSignatureStorage(ctx);
-    return storage.getSignatures(this.submissionId);
+  private async _getRequiredConfirmations(): Promise<number> {
+    const network = await getProvider(this.ctx).getNetwork();
+    if (network.chainId == 137) return 256;
+    else return 12;
   }
 
-  async getClaimArgs(ctx: EVMContext): Promise<ClaimArgs> {
-    return getClaimArgs(this, ctx);
+  async toEVMClaim(destinationCtx: EVMContext): Promise<EVMClaim> {
+    if (!destinationCtx.signatureStorage)
+      destinationCtx.signatureStorage = this.ctx.signatureStorage;
+    return new EVMClaim(this.submissionId, {
+      debridgeId: this.debridgeId,
+      amount: this.amount,
+      chainIdFrom: this.originChainId,
+      receiver: this.receiver,
+      nonce: this.nonce,
+      autoParams: this.autoParams.toClaimAutoParams(this),
+    }, destinationCtx)
   }
+
+  // async toEVMDeployAsset(): Promise<void> {}
 }
 
-export async function getClaimArgs(
-  submission: EVMSubmission,
-  ctx: EVMContext
-): Promise<ClaimArgs> {
-  const storage = getSignatureStorage(ctx);
-  const signatures = await storage.getSignatures(submission.submissionId);
-  return [
-    submission.debridgeId,
-    submission.amount,
-    submission.originChainId,
-    submission.receiver,
-    submission.nonce,
-    "0x" + signatures.map((s) => s.replace(/^0x/, "")).join(""),
-    submission.autoParams.toClaimAutoParams(submission).encode(),
-  ];
-}
-
-export async function getSubmissions(
-  txHash: string,
-  ctx: EVMContext
-): Promise<EVMSubmission[]> {
-  const events = await getSentEvents(txHash, ctx);
-  const originChainId = (await getProvider(ctx).getNetwork()).chainId;
-  return events.map(
-    (sentEvent: SentEvent) =>
-      new EVMSubmission({
-        ...sentEvent.args,
-        autoParams: SendAutoParams.decode(sentEvent.args.autoParams),
-        originChainId,
-        sentEvent,
-      })
-  );
-}
 
 async function getSentEvents(
   txHash: string,
