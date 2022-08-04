@@ -1,8 +1,8 @@
 import { deepCopy } from "ethers/lib/utils";
 
-import { EVMClaim } from "./claim";
+import { Claim } from "./claim";
 import {
-  EVMContext,
+  Context,
   getDeBridgeGateAddress,
   getProvider,
 } from "./context";
@@ -19,21 +19,21 @@ export enum SubmissionStatus {
   CLAIMED,
 }
 
-export type TEVMSubmission = Readonly<Omit<SentEventObject, "autoParams">> & {
+export type TSubmission = Readonly<Omit<SentEventObject, "autoParams">> & {
   readonly autoParams: SendAutoParams;
   readonly originChainId: number;
   readonly sentEvent: SentEvent;
 };
 
 // tslint:disable-next-line:no-empty-interface
-export interface EVMSubmission extends TEVMSubmission {}
-export class EVMSubmission {
-  static async from(txHash: string, ctx: EVMContext): Promise<EVMSubmission[]> {
+export interface Submission extends TSubmission {}
+export class Submission {
+  static async findAll(txHash: string, ctx: Context): Promise<Submission[]> {
     const events = await getSentEvents(txHash, ctx);
     const originChainId = (await getProvider(ctx).getNetwork()).chainId;
     return events.map(
       (sentEvent: SentEvent) =>
-        new EVMSubmission({
+        new Submission({
           ...sentEvent.args,
           autoParams: SendAutoParams.decode(sentEvent.args.autoParams),
           originChainId,
@@ -42,7 +42,12 @@ export class EVMSubmission {
     );
   }
 
-  constructor(args: TEVMSubmission, private ctx: EVMContext) {
+  static async find(txHash: string, submissionId: string, ctx: Context): Promise<Submission | undefined> {
+    const submissions = await Submission.findAll(txHash, ctx);
+    return submissions.find(s => s.submissionId === submissionId)
+  }
+
+  constructor(args: TSubmission, private ctx: Context) {
     Object.assign(this, args);
   }
 
@@ -65,10 +70,10 @@ export class EVMSubmission {
     else return 12;
   }
 
-  async toEVMClaim(destinationCtx: EVMContext): Promise<EVMClaim> {
+  async toEVMClaim(destinationCtx: Context): Promise<Claim> {
     if (!destinationCtx.signatureStorage)
       destinationCtx.signatureStorage = this.ctx.signatureStorage;
-    return new EVMClaim(this.submissionId, {
+    return new Claim(this.submissionId, {
       debridgeId: this.debridgeId,
       amount: this.amount,
       chainIdFrom: this.originChainId,
@@ -84,7 +89,7 @@ export class EVMSubmission {
 
 async function getSentEvents(
   txHash: string,
-  opts: EVMContext
+  opts: Context
 ): Promise<SentEvent[]> {
   const provider = getProvider(opts);
   const txReceipt = await provider.getTransactionReceipt(txHash);

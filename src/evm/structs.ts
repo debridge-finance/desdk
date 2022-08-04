@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers";
 import { BytesLike, defaultAbiCoder, ParamType } from "ethers/lib/utils";
-import { EVMSubmission } from "./submission";
+import { Submission } from "./submission";
 
 export enum Flag {
   UNWRAP_ETH = 0,
@@ -133,7 +133,7 @@ export class SendAutoParams {
     );
   }
 
-  toClaimAutoParams(submission: EVMSubmission): ClaimAutoParams {
+  toClaimAutoParams(submission: Submission): ClaimAutoParams {
     return new ClaimAutoParams({
       ...this,
       nativeSender: submission.nativeSender,

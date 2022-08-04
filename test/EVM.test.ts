@@ -3,8 +3,7 @@ import { BigNumber, ethers } from "ethers";
 import hre from "hardhat";
 import { describe } from "mocha";
 
-import { evm } from "../src";
-import { EVMContext, SignersSignatureStorage } from "../src/evm";
+import { SignersSignatureStorage, Submission, Context as EVMContext } from "../src/evm";
 import {
   CrossChainCounter,
   CrossChainIncrementor,
@@ -24,7 +23,7 @@ declare module "mocha" {
   export interface Context {
     contracts: TestSuiteState;
     tx: ethers.providers.TransactionReceipt;
-    submissions: evm.EVMSubmission[];
+    submissions: Submission[];
     validators: ethers.Signer[];
     evmContext: EVMContext;
   }
@@ -63,7 +62,7 @@ async function deployContracts(
   };
 }
 
-describe("General flow", function () {
+describe("EVM: General flow", function () {
   const INCREMENT_BY = 10;
 
   before(async function () {
@@ -82,7 +81,7 @@ describe("General flow", function () {
   });
 
   it("Must capture one submission", async function () {
-    const submissions = await evm.EVMSubmission.from(
+    const submissions = await Submission.findAll(
       this.tx.transactionHash,
       this.evmContext
     );
@@ -104,7 +103,7 @@ describe("General flow", function () {
   });
 });
 
-describe("General flow: multiple submissions per one txn", function () {
+describe("EVM: General flow: multiple submissions per one txn", function () {
   const INCREMENT_BY = 10;
 
   before(async function () {
@@ -126,7 +125,7 @@ describe("General flow: multiple submissions per one txn", function () {
   });
 
   it("Must capture multiple submissions", async function () {
-    this.submissions = await evm.EVMSubmission.from(
+    this.submissions = await Submission.findAll(
       this.tx.transactionHash,
       this.evmContext
     );

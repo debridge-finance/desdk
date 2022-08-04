@@ -1,6 +1,7 @@
 dist
 build
 lib
+lib.esm
 
 # Logs
 logs

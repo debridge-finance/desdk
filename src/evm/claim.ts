@@ -1,5 +1,5 @@
 import { BigNumberish, BytesLike } from "ethers";
-import { EVMContext, getDeBridgeGate, getProvider, getSignatureStorage } from "./context";
+import { Context, getDeBridgeGate, getProvider, getSignatureStorage } from "./context";
 import { ClaimAutoParams } from "./structs";
 import { SignatureVerifier__factory } from "./typechain";
 
@@ -13,7 +13,7 @@ export type ClaimArgs = [
     BytesLike
 ];
 
-export type TEVMClaimFields = {
+export type TClaimFields = {
     debridgeId: BytesLike,
     amount: BigNumberish,
     chainIdFrom: BigNumberish,
@@ -23,9 +23,9 @@ export type TEVMClaimFields = {
 }
 
 // tslint:disable-next-line:no-empty-interface
-export interface EVMClaim extends TEVMClaimFields {}
-export class EVMClaim {
-    constructor(private submissionId: BytesLike, args: TEVMClaimFields, private ctx: EVMContext) {
+export interface Claim extends TClaimFields {}
+export class Claim {
+    constructor(private submissionId: BytesLike, args: TClaimFields, private ctx: Context) {
         Object.assign(this, args);
     }
 

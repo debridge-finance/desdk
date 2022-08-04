@@ -11,13 +11,13 @@ export type HRELike = {
   }
 }
 
-export interface EVMContext {
+export interface Context {
   provider: HRELike | ethers.providers.Provider | string;
   deBridgeGateAddress?: string;
   signatureStorage?: ISignatureStorage;
 }
 
-export function getProvider(ctx: EVMContext): ethers.providers.Provider {
+export function getProvider(ctx: Context): ethers.providers.Provider {
   if (typeof ctx.provider === "string")
     return new ethers.providers.JsonRpcProvider(ctx.provider as string);
   else if ((ctx.provider as HRELike)?.ethers?.provider)
@@ -30,17 +30,17 @@ export function getProvider(ctx: EVMContext): ethers.providers.Provider {
   );
 }
 
-export function getDeBridgeGateAddress(ctx: EVMContext): string {
+export function getDeBridgeGateAddress(ctx: Context): string {
   return ctx.deBridgeGateAddress || DEFAULT_DEBRIDGE_GATE_ADDRESS;
 }
 
-export function getDeBridgeGate(ctx: EVMContext): DeBridgeGate {
+export function getDeBridgeGate(ctx: Context): DeBridgeGate {
   return DeBridgeGate__factory.connect(
     getDeBridgeGateAddress(ctx),
     getProvider(ctx)
   );
 }
 
-export function getSignatureStorage(ctx: EVMContext): ISignatureStorage {
+export function getSignatureStorage(ctx: Context): ISignatureStorage {
   return ctx.signatureStorage || new DeBridgeApiSignatureStorage();
 }
