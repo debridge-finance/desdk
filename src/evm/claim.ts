@@ -1,9 +1,17 @@
 import { BigNumberish, BytesLike } from "ethers";
 import { EVMContext, getDeBridgeGate, getProvider, getSignatureStorage } from "./context";
 import { ClaimAutoParams } from "./structs";
-import { DeBridgeGate, SignatureVerifier__factory } from "./typechain";
+import { SignatureVerifier__factory } from "./typechain";
 
-export type ClaimArgs = Parameters<DeBridgeGate["claim"]>;
+export type ClaimArgs = [
+    BytesLike,
+    BigNumberish,
+    BigNumberish,
+    string,
+    BigNumberish,
+    BytesLike,
+    BytesLike
+];
 
 export type TEVMClaimFields = {
     debridgeId: BytesLike,

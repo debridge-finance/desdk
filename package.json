@@ -5,9 +5,9 @@
   "repository": "github:debridge-finance/desdk",
   "author": "deBridge",
   "license": "MIT",
-  "main": "build/lib/index.js",
-  "types": "build/lib/index.d.ts",
-  "module": "build/lib.esm/index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "module": "lib.esm/index.js",
   "keywords": [
     "bridge",
     "deBridge",
