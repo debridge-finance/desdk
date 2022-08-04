@@ -6,7 +6,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "./build/lib.esm",
+    "outDir": "./lib.esm",
     "strict": true,
     "esModuleInterop": true,
     "lib": [
@@ -15,6 +15,6 @@
       "dom"
     ],
   },
-  "exclude": ["build", "node_modules"],
+  "exclude": ["lib", "node_modules"],
   "include": ["src"],
 }

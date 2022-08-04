@@ -5,7 +5,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "./build/lib",
+    "outDir": "./lib",
     "strict": true,
     "esModuleInterop": true,
     "lib": [
@@ -14,6 +14,6 @@
       "dom"
     ],
   },
-  "exclude": ["build", "node_modules"],
+  "exclude": ["lib", "node_modules"],
   "include": ["src"],
 }
