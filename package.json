@@ -25,7 +25,8 @@
     "prepare": "npm run build"
   },
   "files": [
-    "build/**",
+    "lib/**",
+    "lib.esm/**",
     "LICENSE",
     "README.md"
   ],
