@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+
 import { DeBridgeApiSignatureStorage, ISignatureStorage } from "./connectors";
 import { DeBridgeGate, DeBridgeGate__factory } from "./typechain";
 
@@ -7,9 +8,9 @@ export const DEFAULT_DEBRIDGE_GATE_ADDRESS =
 
 export type HRELike = {
   ethers: {
-    provider: ethers.providers.JsonRpcProvider
-  }
-}
+    provider: ethers.providers.JsonRpcProvider;
+  };
+};
 
 export interface Context {
   provider: HRELike | ethers.providers.Provider | string;
@@ -25,9 +26,7 @@ export function getProvider(ctx: Context): ethers.providers.Provider {
   else if ((ctx.provider as ethers.providers.Provider)?._isProvider)
     return ctx.provider as ethers.providers.Provider;
 
-  throw new Error(
-    "deSDK: cannot resolve network provider from the context"
-  );
+  throw new Error("deSDK: cannot resolve network provider from the context");
 }
 
 export function getDeBridgeGateAddress(ctx: Context): string {

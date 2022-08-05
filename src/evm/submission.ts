@@ -1,11 +1,7 @@
 import { deepCopy } from "ethers/lib/utils";
 
 import { Claim } from "./claim";
-import {
-  Context,
-  getDeBridgeGateAddress,
-  getProvider,
-} from "./context";
+import { Context, getDeBridgeGateAddress, getProvider } from "./context";
 import { SendAutoParams } from "./structs";
 import { DeBridgeGate__factory } from "./typechain";
 import {
@@ -33,18 +29,25 @@ export class Submission {
     const originChainId = (await getProvider(ctx).getNetwork()).chainId;
     return events.map(
       (sentEvent: SentEvent) =>
-        new Submission({
-          ...sentEvent.args,
-          autoParams: SendAutoParams.decode(sentEvent.args.autoParams),
-          originChainId,
-          sentEvent,
-        }, ctx)
+        new Submission(
+          {
+            ...sentEvent.args,
+            autoParams: SendAutoParams.decode(sentEvent.args.autoParams),
+            originChainId,
+            sentEvent,
+          },
+          ctx
+        )
     );
   }
 
-  static async find(txHash: string, submissionId: string, ctx: Context): Promise<Submission | undefined> {
+  static async find(
+    txHash: string,
+    submissionId: string,
+    ctx: Context
+  ): Promise<Submission | undefined> {
     const submissions = await Submission.findAll(txHash, ctx);
-    return submissions.find(s => s.submissionId === submissionId)
+    return submissions.find((s) => s.submissionId === submissionId);
   }
 
   constructor(args: TSubmission, private ctx: Context) {
@@ -52,12 +55,16 @@ export class Submission {
   }
 
   async isConfirmed(overrideBlockConfirmations?: number): Promise<boolean> {
-    const requiredConfirmations = overrideBlockConfirmations === undefined
-      ? await this._getRequiredConfirmations()
-      : overrideBlockConfirmations;
+    const requiredConfirmations =
+      overrideBlockConfirmations === undefined
+        ? await this._getRequiredConfirmations()
+        : overrideBlockConfirmations;
 
     const currentBlockNumber = await getProvider(this.ctx).getBlockNumber();
-    if (this.sentEvent.blockNumber + requiredConfirmations <= currentBlockNumber) {
+    if (
+      this.sentEvent.blockNumber + requiredConfirmations <=
+      currentBlockNumber
+    ) {
       return true;
     }
 
@@ -66,26 +73,29 @@ export class Submission {
 
   private async _getRequiredConfirmations(): Promise<number> {
     const network = await getProvider(this.ctx).getNetwork();
-    if (network.chainId == 137) return 256;
+    if (network.chainId === 137) return 256;
     else return 12;
   }
 
   async toEVMClaim(destinationCtx: Context): Promise<Claim> {
     if (!destinationCtx.signatureStorage)
       destinationCtx.signatureStorage = this.ctx.signatureStorage;
-    return new Claim(this.submissionId, {
-      debridgeId: this.debridgeId,
-      amount: this.amount,
-      chainIdFrom: this.originChainId,
-      receiver: this.receiver,
-      nonce: this.nonce,
-      autoParams: this.autoParams.toClaimAutoParams(this),
-    }, destinationCtx)
+    return new Claim(
+      this.submissionId,
+      {
+        debridgeId: this.debridgeId,
+        amount: this.amount,
+        chainIdFrom: this.originChainId,
+        receiver: this.receiver,
+        nonce: this.nonce,
+        autoParams: this.autoParams.toClaimAutoParams(this),
+      },
+      destinationCtx
+    );
   }
 
   // async toEVMDeployAsset(): Promise<void> {}
 }
-
 
 async function getSentEvents(
   txHash: string,

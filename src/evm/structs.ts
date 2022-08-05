@@ -1,5 +1,6 @@
 import { BigNumber, BigNumberish } from "ethers";
 import { BytesLike, defaultAbiCoder, ParamType } from "ethers/lib/utils";
+
 import { Submission } from "./submission";
 
 export enum Flag {
@@ -20,13 +21,13 @@ export class Flags {
   private _flags: number = 0;
 
   static decode(rawValue: number) {
-    const flags = new Flags()
+    const flags = new Flags();
     flags._flags = rawValue;
     return flags;
   }
 
   constructor(...flags: Flag[]) {
-    this.setFlags(...flags)
+    this.setFlags(...flags);
   }
 
   public setFlags(...flags: Flag[]) {
@@ -130,12 +131,14 @@ export class SendAutoParams {
   encode(): string {
     return defaultAbiCoder.encode(
       [SubmissionAutoParamsToParam],
-      [[
-        this.executionFee,
-        this.flags.toString(),
-        this.fallbackAddress,
-        this.data,
-      ]]
+      [
+        [
+          this.executionFee,
+          this.flags.toString(),
+          this.fallbackAddress,
+          this.data,
+        ],
+      ]
     );
   }
 

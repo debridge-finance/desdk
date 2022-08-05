@@ -1,4 +1,5 @@
 import { BytesLike, ethers } from "ethers";
+
 import { SubmissionStatus } from "./submission";
 
 type DeBridgeApiGetFullSubmissionInfoResponse = {
@@ -9,7 +10,10 @@ type DeBridgeApiGetFullSubmissionInfoResponse = {
 
 export class DeBridgeApiStatus {
   async getStatus(submissionId: string): Promise<SubmissionStatus> {
-    const url = `https://api.debridge.finance/api/Transactions/GetFullSubmissionInfo?filter=${submissionId}`;
+    const url = [
+      `https://api.debridge.finance`,
+      `/api/Transactions/GetFullSubmissionInfo?filter=${submissionId}`,
+    ].join("");
     const response = await fetch(url);
     const data =
       (await response.json()) as DeBridgeApiGetFullSubmissionInfoResponse;
@@ -68,7 +72,10 @@ type DeBridgeApiGetSignaturesResponse = {
 
 export class DeBridgeApiSignatureStorage implements ISignatureStorage {
   async getSignatures(submissionId: string) {
-    const url = `https://api.debridge.finance/api/SubmissionConfirmations/getForSubmission?submissionId=${submissionId}`;
+    const url = [
+      `https://api.debridge.finance`,
+      `/api/SubmissionConfirmations/getForSubmission?submissionId=${submissionId}`,
+    ].join("");
     // const url = `https://api.debridge.finance/submission/${submissionId}/signatures`
     const response = await fetch(url);
     const data = (await response.json()) as DeBridgeApiGetSignaturesResponse;
