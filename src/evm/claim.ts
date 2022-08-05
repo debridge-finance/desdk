@@ -14,18 +14,18 @@ export type ClaimArgs = [
 ];
 
 export type TClaimFields = {
-    debridgeId: BytesLike,
-    amount: BigNumberish,
-    chainIdFrom: BigNumberish,
-    receiver: string,
-    nonce: BigNumberish,
-    autoParams: ClaimAutoParams,
+    readonly debridgeId: BytesLike,
+    readonly amount: BigNumberish,
+    readonly chainIdFrom: BigNumberish,
+    readonly receiver: string,
+    readonly nonce: BigNumberish,
+    readonly autoParams: ClaimAutoParams,
 }
 
 // tslint:disable-next-line:no-empty-interface
 export interface Claim extends TClaimFields {}
 export class Claim {
-    constructor(private submissionId: BytesLike, args: TClaimFields, private ctx: Context) {
+    constructor(public readonly submissionId: BytesLike, args: TClaimFields, private ctx: Context) {
         Object.assign(this, args);
     }
 

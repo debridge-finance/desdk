@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers";
+import { BigNumber, BigNumberish } from "ethers";
 import { BytesLike, defaultAbiCoder, ParamType } from "ethers/lib/utils";
 import { Submission } from "./submission";
 
@@ -19,8 +19,14 @@ export enum Flag {
 export class Flags {
   private _flags: number = 0;
 
-  constructor(flags: number) {
-    this._flags = flags;
+  static decode(rawValue: number) {
+    const flags = new Flags()
+    flags._flags = rawValue;
+    return flags;
+  }
+
+  constructor(...flags: Flag[]) {
+    this.setFlags(...flags)
   }
 
   public setFlags(...flags: Flag[]) {
@@ -92,7 +98,7 @@ export const SubmissionAutoParamsFromParam = ParamType.from({
 });
 
 type TSendAutoParams = {
-  readonly executionFee: BigNumber;
+  readonly executionFee: BigNumberish;
   readonly flags: Flags;
   readonly fallbackAddress: string;
   readonly data: string;
@@ -109,7 +115,7 @@ export class SendAutoParams {
 
     return new SendAutoParams({
       ...struct,
-      flags: new Flags(struct.flags.toNumber()),
+      flags: Flags.decode(struct.flags.toNumber()),
     });
   }
 
@@ -124,12 +130,12 @@ export class SendAutoParams {
   encode(): string {
     return defaultAbiCoder.encode(
       [SubmissionAutoParamsToParam],
-      [
+      [[
         this.executionFee,
         this.flags.toString(),
         this.fallbackAddress,
         this.data,
-      ]
+      ]]
     );
   }
 
@@ -142,7 +148,7 @@ export class SendAutoParams {
 }
 
 type TClaimAutoParams = {
-  readonly executionFee: BigNumber;
+  readonly executionFee: BigNumberish;
   readonly flags: Flags;
   readonly fallbackAddress: BytesLike;
   readonly data: BytesLike;
@@ -160,7 +166,7 @@ export class ClaimAutoParams {
 
     return new ClaimAutoParams({
       ...struct,
-      flags: new Flags(struct.flags.toNumber()),
+      flags: Flags.decode(struct.flags.toNumber()),
     });
   }
 
