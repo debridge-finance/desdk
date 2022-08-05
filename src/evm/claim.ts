@@ -10,13 +10,13 @@ import { ClaimAutoParams } from "./structs";
 import { SignatureVerifier__factory } from "./typechain";
 
 export type ClaimArgs = [
-  BytesLike,
-  BigNumberish,
-  BigNumberish,
   string,
-  BigNumberish,
-  BytesLike,
-  BytesLike
+  string,
+  string,
+  string,
+  string,
+  string,
+  string
 ];
 
 export type TClaimFields = {
@@ -76,11 +76,11 @@ export class Claim {
     const signatures = await this.getSignatures();
 
     return [
-      this.debridgeId,
-      this.amount,
-      this.chainIdFrom,
-      this.receiver,
-      this.nonce,
+      this.debridgeId.toString(),
+      this.amount.toString(),
+      this.chainIdFrom.toString(),
+      this.receiver.toString(),
+      this.nonce.toString(),
       "0x" + signatures.map((s) => s.replace(/^0x/, "")).join(""),
       this.autoParams.encode(),
     ];

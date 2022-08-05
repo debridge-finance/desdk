@@ -1,5 +1,6 @@
 import { assert, expect } from "chai";
 import { BigNumber, ethers } from "ethers";
+import { parseEther } from "ethers/lib/utils";
 import hre from "hardhat";
 import { describe } from "mocha";
 
@@ -12,6 +13,7 @@ import {
   Flag,
   Claim,
   ClaimAutoParams,
+  Message,
 } from "../src/evm";
 import { DeBridgeGate } from "../src/evm/typechain";
 import {
@@ -74,6 +76,62 @@ async function deployContracts(
     incrementor,
   };
 }
+
+describe("EVM: Send", function () {
+  describe("Smoke test", function () {
+    before(async function () {
+      const signers = await hre.ethers.getSigners();
+      this.validators = signers.slice(0, 12);
+      this.contracts = await deployContracts(this.validators);
+      this.evmContext = {
+        provider: hre,
+        deBridgeGateAddress: this.contracts.gate.address,
+        signatureStorage: new SignersSignatureStorage(this.validators),
+      };
+    });
+
+    it("Should transfer", async function () {
+      const fee = this.contracts.gateProtocolFee;
+      const transferAmount = parseEther("1");
+
+      const [, receiver] = await hre.ethers.getSigners();
+      const receiverAmountBefore = await receiver.getBalance();
+      const expectedAmount = receiverAmountBefore.add(
+        transferAmount.mul(10000 - 10).div(10000)
+      );
+
+      const message = new Message({
+        tokenAddress: ethers.constants.AddressZero,
+        amount: transferAmount,
+        chainIdTo: hre.ethers.provider.network.chainId,
+        receiver: receiver.address,
+        autoParams: new SendAutoParams({
+          executionFee: BigNumber.from("0"),
+          fallbackAddress: receiver.address,
+          flags: new Flags(Flag.UNWRAP_ETH), // expect to receive native ether
+          data: "0x",
+        })
+      })
+
+      const txSend = await this.contracts.gate.send(
+        ...message.toSendArgs(),
+        { value: transferAmount.add(fee) }
+      );
+      const txReceipt = await txSend.wait();
+
+      const submissions = await Submission.findAll(txReceipt.transactionHash, this.evmContext);
+      expect(1).to.be.eq(submissions.length);
+
+      const [submission] = submissions;
+      const claim = await submission.toEVMClaim(this.evmContext);
+      const claimArgs = await claim.getClaimArgs();
+      await this.contracts.gate.claim(...claimArgs);
+
+      const receiverAmountAfter = await receiver.getBalance();
+      expect(receiverAmountAfter.eq(expectedAmount)).to.equal(true);
+    });
+  });
+})
 
 describe("EVM: General flow", function () {
   const INCREMENT_BY = 10;
