@@ -5,10 +5,9 @@ import { describe } from "mocha";
 
 import { SignersSignatureStorage, Submission, Context as EVMContext, Flags, SendAutoParams, Flag, Claim, ClaimAutoParams } from "../src/evm";
 import {
-  CrossChainCounter,
-  CrossChainIncrementor,
   DeBridgeGate,
 } from "../src/evm/typechain";
+import { CrossChainCounter, CrossChainCounter__factory, CrossChainIncrementor, CrossChainIncrementor__factory } from "./fixture/typechain";
 
 import { deployGate } from "./lib";
 
@@ -34,15 +33,15 @@ async function deployContracts(
   signers: ethers.Signer[]
 ): Promise<TestSuiteState> {
   const gate = await deployGate({
-    validators: signers,
-  });
+    validators: signers
+  })
 
-  const Counter = await hre.ethers.getContractFactory("CrossChainCounter");
+  const [deployer] = await hre.ethers.getSigners()
+
+  const Counter = await new CrossChainCounter__factory().connect(deployer);
   const counter = await Counter.deploy(gate.address);
 
-  const Incrementor = await hre.ethers.getContractFactory(
-    "CrossChainIncrementor"
-  );
+  const Incrementor = await new CrossChainIncrementor__factory().connect(deployer);
   const incrementor = await Incrementor.deploy(
     gate.address,
     hre.ethers.provider.network.chainId,

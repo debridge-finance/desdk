@@ -152,26 +152,6 @@ declare module "hardhat/types/runtime" {
       name: "IERC165",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
-    getContractFactory(
-      name: "CrossChainCounter",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.CrossChainCounter__factory>;
-    getContractFactory(
-      name: "IDebridgeGateWithCallProxyGetter",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IDebridgeGateWithCallProxyGetter__factory>;
-    getContractFactory(
-      name: "CrossChainIncrementor",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.CrossChainIncrementor__factory>;
-    getContractFactory(
-      name: "IDeBridgeGateExtended",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IDeBridgeGateExtended__factory>;
-    getContractFactory(
-      name: "ICrossChainCounter",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ICrossChainCounter__factory>;
 
     getContractAt(
       name: "ICallProxy",
@@ -348,31 +328,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165>;
-    getContractAt(
-      name: "CrossChainCounter",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.CrossChainCounter>;
-    getContractAt(
-      name: "IDebridgeGateWithCallProxyGetter",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IDebridgeGateWithCallProxyGetter>;
-    getContractAt(
-      name: "CrossChainIncrementor",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.CrossChainIncrementor>;
-    getContractAt(
-      name: "IDeBridgeGateExtended",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IDeBridgeGateExtended>;
-    getContractAt(
-      name: "ICrossChainCounter",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ICrossChainCounter>;
 
     // default types
     getContractFactory(

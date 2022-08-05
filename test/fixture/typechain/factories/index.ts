@@ -3,3 +3,4 @@
 /* eslint-disable */
 export * as debridgeFinance from "./@debridge-finance";
 export * as openzeppelin from "./@openzeppelin";
+export * as contracts from "./contracts";
