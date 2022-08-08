@@ -8,6 +8,13 @@ import {
 } from "./context";
 import { ClaimAutoParams } from "./structs";
 import { SignatureVerifier__factory } from "./typechain";
+import {
+  ClaimedEventObject,
+  IDeBridgeGate,
+  SentEvent,
+  SentEventObject,
+} from "./typechain/@debridge-finance/contracts/contracts/interfaces/IDeBridgeGate";
+
 
 export type ClaimArgs = [
   string,
@@ -19,21 +26,20 @@ export type ClaimArgs = [
   string
 ];
 
-export type TClaimFields = {
-  readonly debridgeId: BytesLike;
-  readonly amount: BigNumberish;
-  readonly chainIdFrom: BigNumberish;
+export type TClaim = Readonly<Omit<ClaimedEventObject, 'amount' | 'nonce' | 'chainIdFrom' | 'autoParams' | 'isNativeToken'> & {
+  readonly debridgeId: string;
+  readonly amount: string;
+  readonly chainIdFrom: number;
   readonly receiver: string;
-  readonly nonce: BigNumberish;
+  readonly nonce: string;
   readonly autoParams: ClaimAutoParams;
-};
+}>
 
 // tslint:disable-next-line:no-empty-interface
-export interface Claim extends TClaimFields {}
+export interface Claim extends TClaim {}
 export class Claim {
   constructor(
-    public readonly submissionId: BytesLike,
-    args: TClaimFields,
+    args: TClaim,
     private ctx: Context
   ) {
     Object.assign(this, args);

@@ -1,3 +1,4 @@
+import { BigNumber } from "ethers";
 import { deepCopy } from "ethers/lib/utils";
 
 import { Claim } from "./claim";
@@ -5,6 +6,7 @@ import { Context, getDeBridgeGateAddress, getProvider } from "./context";
 import { SendAutoParams } from "./structs";
 import { DeBridgeGate__factory } from "./typechain";
 import {
+  IDeBridgeGate,
   SentEvent,
   SentEventObject,
 } from "./typechain/@debridge-finance/contracts/contracts/interfaces/IDeBridgeGate";
@@ -15,11 +17,15 @@ export enum SubmissionStatus {
   CLAIMED,
 }
 
-export type TSubmission = Readonly<Omit<SentEventObject, "autoParams">> & {
-  readonly autoParams: SendAutoParams;
-  readonly originChainId: number;
-  readonly sentEvent: SentEvent;
-};
+export type TSubmission = Readonly<Omit<SentEventObject, 'amount' | 'nonce' | 'chainIdTo' | 'autoParams'> & {
+  amount: string;
+  nonce: string;
+  chainIdTo: string;
+  autoParams: SendAutoParams;
+
+  originChainId: number;
+  sentEvent: SentEvent;
+}>;
 
 // tslint:disable-next-line:no-empty-interface
 export interface Submission extends TSubmission {}
@@ -31,8 +37,17 @@ export class Submission {
       (sentEvent: SentEvent) =>
         new Submission(
           {
-            ...sentEvent.args,
+            submissionId: sentEvent.args.submissionId.toString(),
+            debridgeId: sentEvent.args.debridgeId.toString(),
+            amount: sentEvent.args.amount.toString(),
+            receiver: sentEvent.args.receiver.toString(),
+            nonce: sentEvent.args.nonce.toString(),
+            chainIdTo: sentEvent.args.chainIdTo.toString(),
+            referralCode: sentEvent.args.referralCode,
+            feeParams: sentEvent.args.feeParams,
             autoParams: SendAutoParams.decode(sentEvent.args.autoParams),
+            nativeSender: sentEvent.args.nativeSender.toString(),
+
             originChainId,
             sentEvent,
           },
@@ -83,8 +98,8 @@ export class Submission {
     if (!destinationCtx.signatureStorage)
       destinationCtx.signatureStorage = this.ctx.signatureStorage;
     return new Claim(
-      this.submissionId,
       {
+        submissionId: this.submissionId,
         debridgeId: this.debridgeId,
         amount: this.amount,
         chainIdFrom: this.originChainId,

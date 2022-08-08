@@ -99,7 +99,7 @@ export const SubmissionAutoParamsFromParam = ParamType.from({
 });
 
 type TSendAutoParams = {
-  readonly executionFee: BigNumberish;
+  readonly executionFee: string;
   readonly flags: Flags;
   readonly fallbackAddress: string;
   readonly data: string;
@@ -151,7 +151,7 @@ export class SendAutoParams {
 }
 
 type TClaimAutoParams = {
-  readonly executionFee: BigNumberish;
+  readonly executionFee: string;
   readonly flags: Flags;
   readonly fallbackAddress: BytesLike;
   readonly data: BytesLike;
