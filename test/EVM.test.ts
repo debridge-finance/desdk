@@ -93,15 +93,18 @@ describe("EVM: Send", function () {
     it("Should transfer", async function () {
       const fee = this.contracts.gateProtocolFee;
       const transferAmount = parseEther("1");
-      const executionFee = parseEther('0.1').toString();
+      const executionFee = parseEther("0.1").toString();
 
       const [, receiver] = await hre.ethers.getSigners();
       const receiverBalanceBefore = await receiver.getBalance();
       // take 10bps and exfee
       const expectedAmountAfterBridge = transferAmount
-        .mul(10000 - 10).div(10000)
+        .mul(10000 - 10)
+        .div(10000)
         .sub(executionFee);
-      const expectedReceiverBalanceAfter = receiverBalanceBefore.add(expectedAmountAfterBridge);
+      const expectedReceiverBalanceAfter = receiverBalanceBefore.add(
+        expectedAmountAfterBridge
+      );
 
       const message = new Message({
         tokenAddress: ethers.constants.AddressZero,
@@ -113,8 +116,8 @@ describe("EVM: Send", function () {
           fallbackAddress: receiver.address,
           flags: new Flags(Flag.UNWRAP_ETH), // expect to receive native ether
           data: "0x",
-        })
-      })
+        }),
+      });
 
       const txSend = await this.contracts.gate.send(
         ...message.getEncodedArgs(),
@@ -122,26 +125,28 @@ describe("EVM: Send", function () {
       );
       const txReceipt = await txSend.wait();
 
-      const submissions = await Submission.findAll(txReceipt.transactionHash, this.evmContext);
+      const submissions = await Submission.findAll(
+        txReceipt.transactionHash,
+        this.evmContext
+      );
       expect(1).to.be.eq(submissions.length);
 
       const [submission] = submissions;
-      expect(submission.autoParams.executionFee)
-        .to.eq(executionFee)
+      expect(submission.autoParams.executionFee).to.eq(executionFee);
 
       const claim = await submission.toEVMClaim(this.evmContext);
-      expect(expectedAmountAfterBridge.toString())
-        .to.eq(claim.amount)
+      expect(expectedAmountAfterBridge.toString()).to.eq(claim.amount);
 
       const claimArgs = await claim.getEncodedArgs();
       await this.contracts.gate.claim(...claimArgs);
 
       const receiverAmountAfter = await receiver.getBalance();
-      expect(receiverAmountAfter.eq(expectedReceiverBalanceAfter)).to.equal(true);
+      expect(receiverAmountAfter.eq(expectedReceiverBalanceAfter)).to.equal(
+        true
+      );
     });
   });
-})
-
+});
 
 describe("EVM: General flow", function () {
   const INCREMENT_BY = 10;
@@ -176,14 +181,14 @@ describe("EVM: General flow", function () {
 
   it("Submission must not be confirmed within 12 blocks", async function () {
     const [submission] = this.submissions;
-    expect(false).equals(await submission.hasRequiredBlockConfirmations(12))
-  })
+    expect(false).equals(await submission.hasRequiredBlockConfirmations(12));
+  });
 
   it("Submission must be confirmed after 12 blocks", async function () {
-    await hre.network.provider.send("hardhat_mine", ['0x' + 12..toString(16)]);
+    await hre.network.provider.send("hardhat_mine", ["0x" + (12).toString(16)]);
     const [submission] = this.submissions;
-    expect(true).equals(await submission.hasRequiredBlockConfirmations(12))
-  })
+    expect(true).equals(await submission.hasRequiredBlockConfirmations(12));
+  });
 
   it("Must claim", async function () {
     const claim = await this.submissions[0].toEVMClaim(this.evmContext);
@@ -251,7 +256,7 @@ describe("EVM: General flow: multiple submissions per one txn", function () {
 
 describe("EVM: structs", function () {
   const SEND_AUTOPARAMS = {
-    executionFee: '0',
+    executionFee: "0",
     flags: Flags.decode(6),
     fallbackAddress: "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
     data: "0xcca5afd4000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266",
@@ -259,7 +264,7 @@ describe("EVM: structs", function () {
   const SEND_AUTOPARAMS_RAW =
     "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000014f39fd6e51aad88f6f4ce6ab8827279cfffb922660000000000000000000000000000000000000000000000000000000000000000000000000000000000000044cca5afd4000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb9226600000000000000000000000000000000000000000000000000000000";
   const CLAIM_AUTOPARAMS = {
-    executionFee: '0',
+    executionFee: "0",
     flags: Flags.decode(6),
     fallbackAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
     data: "0xcca5afd4000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266",

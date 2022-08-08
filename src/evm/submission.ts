@@ -17,15 +17,17 @@ export enum SubmissionStatus {
   CLAIMED,
 }
 
-export type TSubmission = Readonly<Omit<SentEventObject, 'amount' | 'nonce' | 'chainIdTo' | 'autoParams'> & {
-  amount: string;
-  nonce: string;
-  chainIdTo: string;
-  autoParams: SendAutoParams;
+export type TSubmission = Readonly<
+  Omit<SentEventObject, "amount" | "nonce" | "chainIdTo" | "autoParams"> & {
+    amount: string;
+    nonce: string;
+    chainIdTo: string;
+    autoParams: SendAutoParams;
 
-  originChainId: number;
-  sentEvent: SentEvent;
-}>;
+    originChainId: number;
+    sentEvent: SentEvent;
+  }
+>;
 
 // tslint:disable-next-line:no-empty-interface
 export interface Submission extends TSubmission {}
@@ -69,7 +71,9 @@ export class Submission {
     Object.assign(this, args);
   }
 
-  async hasRequiredBlockConfirmations(overrideBlockConfirmations?: number): Promise<boolean> {
+  async hasRequiredBlockConfirmations(
+    overrideBlockConfirmations?: number
+  ): Promise<boolean> {
     const requiredConfirmations =
       overrideBlockConfirmations === undefined
         ? await this._getRequiredConfirmations()
@@ -78,10 +82,7 @@ export class Submission {
     const currentBlockNumber = await getProvider(this.ctx).getBlockNumber();
     const submissionBlockNumber = this.sentEvent.blockNumber;
 
-    if (
-      submissionBlockNumber + requiredConfirmations <=
-      currentBlockNumber
-    ) {
+    if (submissionBlockNumber + requiredConfirmations <= currentBlockNumber) {
       return true;
     }
 
@@ -131,8 +132,8 @@ async function getSentEvents(
         const logDescription = contract.interface.parseLog(log);
         return {
           ...log,
-          ...logDescription
-        }
+          ...logDescription,
+        };
       } catch (e) {}
     })
     .filter((log) => log !== undefined)

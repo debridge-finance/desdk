@@ -15,7 +15,6 @@ import {
   SentEventObject,
 } from "./typechain/@debridge-finance/contracts/contracts/interfaces/IDeBridgeGate";
 
-
 export type ClaimArgs = [
   string,
   string,
@@ -26,22 +25,24 @@ export type ClaimArgs = [
   string
 ];
 
-export type TClaim = Readonly<Omit<ClaimedEventObject, 'amount' | 'nonce' | 'chainIdFrom' | 'autoParams' | 'isNativeToken'> & {
-  readonly debridgeId: string;
-  readonly amount: string;
-  readonly chainIdFrom: number;
-  readonly receiver: string;
-  readonly nonce: string;
-  readonly autoParams: ClaimAutoParams;
-}>
+export type TClaim = Readonly<
+  Omit<
+    ClaimedEventObject,
+    "amount" | "nonce" | "chainIdFrom" | "autoParams" | "isNativeToken"
+  > & {
+    readonly debridgeId: string;
+    readonly amount: string;
+    readonly chainIdFrom: number;
+    readonly receiver: string;
+    readonly nonce: string;
+    readonly autoParams: ClaimAutoParams;
+  }
+>;
 
 // tslint:disable-next-line:no-empty-interface
 export interface Claim extends TClaim {}
 export class Claim {
-  constructor(
-    args: TClaim,
-    private ctx: Context
-  ) {
+  constructor(args: TClaim, private ctx: Context) {
     Object.assign(this, args);
   }
 
