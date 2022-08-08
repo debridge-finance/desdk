@@ -68,7 +68,7 @@ After the submission has been successfully submitted (by calling the `deBridgeGa
 // a contract may call deBridgeGate.send() multiple times, e.g. to submit data
 // to different chains simultaneously - that's why Submission.findAll()
 // returns an array of Submission objects
-const submissions = await Submission.findAll(
+const submissions = await evm.Submission.findAll(
     // set the tx hash to inspect for new submissions
     transactionHash,
     {
@@ -85,6 +85,10 @@ const [submission] = submissions;
 // confirmations before sign the message. Currently, 12 blocks is expected
 // for most supported EVM chains (256 for Polygon).
 const isConfirmed = await submission.isConfirmed();
+
+// there is also a bunch of useful properties that describe the submission, e.g.
+console.log("cross-chain asset ID transferred: ", submission.debridgeId)
+console.log("amount transferred to", submission.amount, submission.receiver)
 ```
 
 ## Tracking and executing claims
@@ -136,6 +140,6 @@ Then pass this object as an optional param every time you communicate with deSDK
 
 ```ts
 const message = new evm.Message(messageParams, evmContext);
-const submissions = await Submission.findAll(transactionHash, evmContext);
+const submissions = await evm.Submission.findAll(transactionHash, evmContext);
 const claim = await submission.toEVMClaim(evmContext);
 ```

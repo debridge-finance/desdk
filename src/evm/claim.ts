@@ -85,4 +85,6 @@ export class Claim {
       this.autoParams.encode(),
     ];
   }
+
+  // TODO getClaimInfo() must return date from the claim event
 }
