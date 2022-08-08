@@ -114,7 +114,7 @@ describe("EVM: Send", function () {
       })
 
       const txSend = await this.contracts.gate.send(
-        ...message.toSendArgs(),
+        ...message.getEncodedArgs(),
         { value: transferAmount.add(fee) }
       );
       const txReceipt = await txSend.wait();
@@ -124,7 +124,7 @@ describe("EVM: Send", function () {
 
       const [submission] = submissions;
       const claim = await submission.toEVMClaim(this.evmContext);
-      const claimArgs = await claim.getClaimArgs();
+      const claimArgs = await claim.getEncodedArgs();
       await this.contracts.gate.claim(...claimArgs);
 
       const receiverAmountAfter = await receiver.getBalance();
@@ -166,7 +166,7 @@ describe("EVM: General flow", function () {
 
   it("Must claim", async function () {
     const claim = await this.submissions[0].toEVMClaim(this.evmContext);
-    const args = await claim.getClaimArgs();
+    const args = await claim.getEncodedArgs();
 
     await this.contracts.gate.claim(...args);
 
@@ -211,7 +211,7 @@ describe("EVM: General flow: multiple submissions per one txn", function () {
       ).toNumber();
 
       const claim = await this.submissions[i].toEVMClaim(this.evmContext);
-      const args = await claim.getClaimArgs();
+      const args = await claim.getEncodedArgs();
 
       await this.contracts.gate.claim(...args);
 

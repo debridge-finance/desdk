@@ -72,7 +72,7 @@ export class Claim {
     return storage.getSignatures(this.submissionId);
   }
 
-  async getClaimArgs(): Promise<ClaimArgs> {
+  async getEncodedArgs(): Promise<ClaimArgs> {
     const signatures = await this.getSignatures();
 
     return [

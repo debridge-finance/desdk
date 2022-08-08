@@ -29,7 +29,7 @@ export class Message {
     Object.assign(this, args);
   }
 
-  toSendArgs(): SendArgs {
+  getEncodedArgs(): SendArgs {
       return [
           this.tokenAddress,
           this.amount.toString(),
