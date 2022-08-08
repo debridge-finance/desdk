@@ -61,8 +61,10 @@ export class Submission {
         : overrideBlockConfirmations;
 
     const currentBlockNumber = await getProvider(this.ctx).getBlockNumber();
+    const submissionBlockNumber = this.sentEvent.blockNumber;
+
     if (
-      this.sentEvent.blockNumber + requiredConfirmations <=
+      submissionBlockNumber + requiredConfirmations <=
       currentBlockNumber
     ) {
       return true;
@@ -111,7 +113,11 @@ async function getSentEvents(
   return txReceipt.logs
     .map((log) => {
       try {
-        return contract.interface.parseLog(log);
+        const logDescription = contract.interface.parseLog(log);
+        return {
+          ...log,
+          ...logDescription
+        }
       } catch (e) {}
     })
     .filter((log) => log !== undefined)
