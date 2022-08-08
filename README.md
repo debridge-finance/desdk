@@ -114,7 +114,7 @@ if (isConfirmed) {
 
 ## Works with `hardhat-debridge` emulated environment!
 
-`hardhat-debridge` is a plugin for [Hardhat](https://hardhat.org) that provides the toolkit to test and emulate dApps built on top of deBridge protocol, and it is confirmed to be `deSDK`-compatible. This means that you can develop automated tests to validate how your deSDK-based scripts cooperate with deBridge infrastructure. After all, the `hardhat-debridge` itself uses deSDK under the hood and is covered with extensive tests which use the plugin and deSDK simultaneously.
+[`hardhat-debridge`](https://github.com/debridge-finance/hardhat-debridge) is a plugin for Hardhat that provides the toolkit to test and emulate dApps built on top of deBridge protocol, and it is confirmed to be deSDK-compatible. This means that you can develop automated tests to validate how your deSDK-based scripts cooperate with deBridge infrastructure. After all, the [`hardhat-debridge`](https://github.com/debridge-finance/hardhat-debridge) itself uses deSDK under the hood and is covered with extensive tests which use the plugin and deSDK simultaneously.
 
 By default, deSDK internals are configured to run against production environments (mainnets for all supported networks: Ethereum, Polygon, etc). To make it work against local emulated environment, craft a special evmContext object:
 
