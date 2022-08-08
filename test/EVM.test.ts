@@ -166,13 +166,13 @@ describe("EVM: General flow", function () {
 
   it("Submission must not be confirmed within 12 blocks", async function () {
     const [submission] = this.submissions;
-    expect(false).equals(await submission.isConfirmed(12))
+    expect(false).equals(await submission.hasRequiredBlockConfirmations(12))
   })
 
   it("Submission must be confirmed after 12 blocks", async function () {
     await hre.network.provider.send("hardhat_mine", ['0x' + 12..toString(16)]);
     const [submission] = this.submissions;
-    expect(true).equals(await submission.isConfirmed(12))
+    expect(true).equals(await submission.hasRequiredBlockConfirmations(12))
   })
 
   it("Must claim", async function () {

@@ -54,7 +54,7 @@ export class Submission {
     Object.assign(this, args);
   }
 
-  async isConfirmed(overrideBlockConfirmations?: number): Promise<boolean> {
+  async hasRequiredBlockConfirmations(overrideBlockConfirmations?: number): Promise<boolean> {
     const requiredConfirmations =
       overrideBlockConfirmations === undefined
         ? await this._getRequiredConfirmations()

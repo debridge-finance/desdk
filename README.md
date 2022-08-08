@@ -62,20 +62,24 @@ const argsForSend = message.getEncodedArgs();
 
 After the submission has been successfully submitted (by calling the `deBridgeGate.send()` method either off-chain or onchain), its status can be tracked using the `evm.Submission` helper methods.
 
+First things first, prepare the context deSDK should work within: you need to provide a URL to EVM RPC node of the origin chain (where the cross-chain call has been started):
+
+```ts
+const evmContext = {
+    // provide a URL to the RPC node of the origin chain
+    provider: "https://mainnet.infura.io/v3/...",
+}
+```
+
+Then pass this context to the `evm.Submission` initialization:
+
 ```ts
 // find all submissions submitted in your transaction by its hash
 // Obviously, a single transaction may contain multiple submissions:
 // a contract may call deBridgeGate.send() multiple times, e.g. to submit data
 // to different chains simultaneously - that's why Submission.findAll()
 // returns an array of Submission objects
-const submissions = await evm.Submission.findAll(
-    // set the tx hash to inspect for new submissions
-    transactionHash,
-    {
-        // provide a URL to the RPC node of the origin chain
-        provider: "https://mainnet.infura.io/v3/...",
-    }
-);
+const submissions = await evm.Submission.findAll(transactionHash, context);
 
 // take the first submission.
 // DO YOUR OWN SANITY CHECKS TO ENSURE IT CONTAINS THE EXPECTED NUMBER OF SUBMISSIONS
@@ -84,7 +88,7 @@ const [submission] = submissions;
 // check if submission if confirmed: validator nodes wait a specific block
 // confirmations before sign the message. Currently, 12 blocks is expected
 // for most supported EVM chains (256 for Polygon).
-const isConfirmed = await submission.isConfirmed();
+const isConfirmed = await submission.hasRequiredBlockConfirmations();
 
 // there is also a bunch of useful properties that describe the submission, e.g.
 console.log("cross-chain asset ID transferred: ", submission.debridgeId)
@@ -95,9 +99,20 @@ console.log("amount transferred to", submission.amount, submission.receiver)
 
 After the submission has been confirmed, each elected validator verifies, signs it with its own private key and publishes the signature to the publicly available storage. After enough signatures were published, a call to `deBridgeGate.claim()` method may be made on the destination chain to finalize the submission and execute the message. The `claim()` methods expects a variety of args, including the contents of the submission and the signatures. To handle this step, an `evm.Claim` object exists, providing handy methods to check the status of the claim and craft a tuple of scalar args (containing encoded values) ready to be passed to the `deBridgeGate`'s `claim()` method in an unopinionated manner.
 
+Again, the first thing to do is to construct a context with the destination chain:
+
+```ts
+const evmDestinationContext = {
+    // provide a URL to the RPC node of the destination chain
+    provider: "https://mainnet.infura.io/v3/...",
+}
+```
+
+Pass this context while accessing the `Claim` object of the particular submission:
+
 ```ts
 if (isConfirmed) {
-    const claim = await submission.toEVMClaim();
+    const claim = await submission.toEVMClaim(evmDestinationContext);
 
     // check if claim has been signed by enough validators
     await isSigned = await claim.isSigned();
@@ -120,7 +135,7 @@ if (isConfirmed) {
 
 [`hardhat-debridge`](https://github.com/debridge-finance/hardhat-debridge) is a plugin for Hardhat that provides the toolkit to test and emulate dApps built on top of deBridge protocol, and it is confirmed to be deSDK-compatible. This means that you can develop automated tests to validate how your deSDK-based scripts cooperate with deBridge infrastructure. After all, the [`hardhat-debridge`](https://github.com/debridge-finance/hardhat-debridge) itself uses deSDK under the hood and is covered with extensive tests which use the plugin and deSDK simultaneously.
 
-By default, deSDK internals are configured to run against production environments (mainnets for all supported networks: Ethereum, Polygon, etc). To make it work against local emulated environment, craft a special evmContext object:
+By default, deSDK internals are configured to run against production environments (mainnets for all supported networks: Ethereum, Polygon, etc). To make it work against local emulated environment, craft a special `evmContext` object:
 
 ```ts
 // craft the context deSDK shall work within

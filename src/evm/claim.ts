@@ -1,4 +1,4 @@
-import { BigNumberish, BytesLike } from "ethers";
+import { BigNumber, BigNumberish, BytesLike } from "ethers";
 
 import {
   Context,
