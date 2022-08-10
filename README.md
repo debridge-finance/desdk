@@ -7,11 +7,8 @@
 Install the package:
 
 ```bash
-npm install --save git@github.com:debridge-finance/desdk.git
+npm i --save @debridge-finance/desdk
 ```
-
-*This product is currently a technology preview. We are going to release the final version along with an npm package later this year.*
-
 
 Import the `evm` namespace:
 
@@ -65,8 +62,8 @@ After the submission has been successfully submitted (by calling the `deBridgeGa
 First things first, prepare the context deSDK should work within: you need to provide a URL to EVM RPC node of the origin chain (where the cross-chain call has been started):
 
 ```ts
-const evmContext = {
-    // provide a URL to the RPC node of the origin chain
+const evmOriginContext: evm.Context = {
+    // provide a URL to the RPC node of the 🛫origin chain
     provider: "https://mainnet.infura.io/v3/...",
 }
 ```
@@ -79,7 +76,7 @@ Then pass this context to the `evm.Submission` initialization:
 // a contract may call deBridgeGate.send() multiple times, e.g. to submit data
 // to different chains simultaneously - that's why Submission.findAll()
 // returns an array of Submission objects
-const submissions = await evm.Submission.findAll(transactionHash, context);
+const submissions = await evm.Submission.findAll(transactionHash, evmOriginContext);
 
 // take the first submission.
 // DO YOUR OWN SANITY CHECKS TO ENSURE IT CONTAINS THE EXPECTED NUMBER OF SUBMISSIONS
@@ -102,8 +99,8 @@ After the submission has been confirmed, each elected validator verifies, signs 
 Again, the first thing to do is to construct a context with the destination chain:
 
 ```ts
-const evmDestinationContext = {
-    // provide a URL to the RPC node of the destination chain
+const evmDestinationContext: evm.Context = {
+    // provide a URL to the RPC node of the 🛬destination chain
     provider: "https://mainnet.infura.io/v3/...",
 }
 ```
@@ -131,7 +128,7 @@ if (isConfirmed) {
 }
 ```
 
-## Works with `hardhat-debridge` emulated environment!
+## Works with a `hardhat-debridge` emulated environment!
 
 [`hardhat-debridge`](https://github.com/debridge-finance/hardhat-debridge) is a plugin for Hardhat that provides the toolkit to test and emulate dApps built on top of deBridge protocol, and it is confirmed to be deSDK-compatible. This means that you can develop automated tests to validate how your deSDK-based scripts cooperate with deBridge infrastructure. After all, the [`hardhat-debridge`](https://github.com/debridge-finance/hardhat-debridge) itself uses deSDK under the hood and is covered with extensive tests which use the plugin and deSDK simultaneously.
 
@@ -139,7 +136,7 @@ By default, deSDK internals are configured to run against production environment
 
 ```ts
 // craft the context deSDK shall work within
-const evmContext = {
+const evmLocalContext: evm.Context = {
     // pass the current hardhat network. deSDK is ready to accept it
     provider: hre,
 
@@ -154,7 +151,7 @@ const evmContext = {
 Then pass this object as an optional param every time you communicate with deSDK classes:
 
 ```ts
-const message = new evm.Message(messageParams, evmContext);
-const submissions = await evm.Submission.findAll(transactionHash, evmContext);
-const claim = await submission.toEVMClaim(evmContext);
+const message = new evm.Message(messageParams, evmLocalContext);
+const submissions = await evm.Submission.findAll(transactionHash, evmLocalContext);
+const claim = await submission.toEVMClaim(evmLocalContext);
 ```
