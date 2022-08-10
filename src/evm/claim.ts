@@ -1,5 +1,3 @@
-import { BigNumber, BigNumberish, BytesLike } from "ethers";
-
 import {
   Context,
   getDeBridgeGate,
@@ -10,9 +8,6 @@ import { ClaimAutoParams } from "./structs";
 import { SignatureVerifier__factory } from "./typechain";
 import {
   ClaimedEventObject,
-  IDeBridgeGate,
-  SentEvent,
-  SentEventObject,
 } from "./typechain/@debridge-finance/contracts/contracts/interfaces/IDeBridgeGate";
 
 export type ClaimArgs = [

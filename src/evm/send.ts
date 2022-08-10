@@ -1,5 +1,4 @@
 import { BigNumberish, BytesLike } from "ethers";
-
 import { SendAutoParams } from "./structs";
 
 type SendArgs = [

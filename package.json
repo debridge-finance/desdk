@@ -1,10 +1,10 @@
 {
   "name": "@debridge-finance/desdk",
   "version": "0.0.1",
-  "description": "deBridge SDK",
+  "description": "Send, track and claim arbitrary cross-chain messages over the deBridge protocol programmatically",
   "repository": "github:debridge-finance/desdk",
   "author": "deBridge",
-  "license": "MIT",
+  "license": "LGPL-3.0-only",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "module": "lib.esm/index.js",
@@ -13,6 +13,7 @@
     "deBridge",
     "ethereum"
   ],
+  "homepage": "https://debridge.finance",
   "scripts": {
     "lint:fix": "prettier --write 'src/**/*.{js,ts}' 'test/**/*.{js,ts}' && tslint --fix --config tslint.json --project tsconfig.json",
     "lint": "tslint --config tslint.json --project tsconfig.json",

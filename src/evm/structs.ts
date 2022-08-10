@@ -1,19 +1,13 @@
-import { BigNumber, BigNumberish } from "ethers";
 import { BytesLike, defaultAbiCoder, ParamType } from "ethers/lib/utils";
 
 import { Submission } from "./submission";
 
 export enum Flag {
   UNWRAP_ETH = 0,
-  /// @dev Flag to revert if external call fails
   REVERT_IF_EXTERNAL_FAIL = 1,
-  /// @dev Flag to call proxy with a sender contract
   PROXY_WITH_SENDER = 2,
-  /// @dev Data is hash in DeBridgeGate send method
   SEND_HASHED_DATA = 3,
-  /// @dev First 24 bytes from data is gas limit for external call
   SEND_EXTERNAL_CALL_GAS_LIMIT = 4,
-  /// @dev Support multi send for externall call
   MULTI_SEND = 5,
 }
 
