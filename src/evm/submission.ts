@@ -1,4 +1,3 @@
-import { BigNumber } from "ethers";
 import { deepCopy } from "ethers/lib/utils";
 
 import { Claim } from "./claim";
@@ -6,7 +5,6 @@ import { Context, getDeBridgeGateAddress, getProvider } from "./context";
 import { SendAutoParams } from "./structs";
 import { DeBridgeGate__factory } from "./typechain";
 import {
-  IDeBridgeGate,
   SentEvent,
   SentEventObject,
 } from "./typechain/@debridge-finance/contracts/contracts/interfaces/IDeBridgeGate";
@@ -112,7 +110,7 @@ export class Submission {
     );
   }
 
-  // async toEVMDeployAsset(): Promise<void> {}
+  // TODO: async toEVMDeployAsset(): Promise<void> {}
 }
 
 async function getSentEvents(

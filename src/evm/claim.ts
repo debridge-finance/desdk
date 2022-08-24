@@ -41,7 +41,8 @@ export class Claim {
     Object.assign(this, args);
   }
 
-  async requiredSignaturesCount(): Promise<number> {
+  // TODO reasonable to introduce per-chain caching here
+  async getRequiredSignaturesCount(): Promise<number> {
     const contract = getDeBridgeGate(this.ctx);
     const excessConfirmations = await getDeBridgeGate(
       this.ctx
@@ -56,7 +57,7 @@ export class Claim {
 
   async isSigned(): Promise<boolean> {
     const signatures = await this.getSignatures();
-    const minRequiredSignatures = await this.requiredSignaturesCount();
+    const minRequiredSignatures = await this.getRequiredSignaturesCount();
     return signatures.length >= minRequiredSignatures;
   }
 

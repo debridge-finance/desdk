@@ -75,7 +75,6 @@ export class DeBridgeApiSignatureStorage implements ISignatureStorage {
       `https://api.debridge.finance`,
       `/api/SubmissionConfirmations/getForSubmission?submissionId=${submissionId}`,
     ].join("");
-    // const url = `https://api.debridge.finance/submission/${submissionId}/signatures`
     const response = await fetch(url);
     const data = (await response.json()) as DeBridgeApiGetSignaturesResponse;
     return data.map((v) => v.signature);

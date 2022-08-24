@@ -1,6 +1,6 @@
 # deBridge SDK
 
-**Send, track and claim arbitrary cross-chain messages over the [deBridge protocol](https://debridge.finance)  programmatically**. deSDK is a framework-agnostic software development kit focused on handling typed messages routed by deBridge - a generic messaging and cross-chain interoperability protocol that enables decentralized transfers of arbitrary data and assets between various blockchains.
+**Send, track and claim arbitrary cross-chain messages programmatically with the [deBridge protocol](https://debridge.finance)**. deSDK is a framework-agnostic software development kit focused on handling typed messages routed by deBridge, a generic messaging and cross-chain interoperability protocol that enables anyone to build powerful cross-chain applications where value and messages flow seamlessly.
 
 ## Installation
 
@@ -18,7 +18,7 @@ import { evm } from "@debridge-finance/desdk";
 
 ## Sending messages directly
 
-`evm.Message` is a high-level typed interface to the `send()` method of the `deBridgeGate` contract. This is the only one method needed to submit a new cross-chain call. The `evm.Message` object takes raw scalar values and typed structs to avoid possible hassles with encoding of complex nested structs. Its `toSendArgs()` method returns a tuple of scalar args (containing encoded values) ready to be passed to the `deBridgeGate`'s `send()` method in an unopinionated manner. Example:
+`evm.Message` is a high-level typed interface to the `send()` method of the `deBridgeGate` contract. This is the only method needed to submit a new cross-chain call. The `evm.Message` object takes raw scalar values and typed structs to avoid possible hassles with encoding complex nested structs. Its `toSendArgs()` method returns a tuple of scalar args (containing encoded values) ready to be passed to the `deBridgeGate`'s `send()` method in an unopinionated manner. Here’s an example:
 
 ```ts
 // the address on the BNB Chain where deETH should be sent to
@@ -57,9 +57,9 @@ const argsForSend = message.getEncodedArgs();
 
 ## Tracking submissions
 
-After the submission has been successfully submitted (by calling the `deBridgeGate.send()` method either off-chain or onchain), its status can be tracked using the `evm.Submission` helper methods.
+After the submission has been successfully submitted (by calling the `deBridgeGate.send()` method either off-chain or on-chain), its status can be tracked using the `evm.Submission` helper methods.
 
-First things first, prepare the context deSDK should work within: you need to provide a URL to EVM RPC node of the origin chain (where the cross-chain call has been started):
+To start, prepare the context deSDK should work within: you need to provide a URL to EVM RPC node of the origin chain (where the cross-chain call has been started):
 
 ```ts
 const evmOriginContext: evm.Context = {
@@ -94,7 +94,9 @@ console.log("amount transferred to", submission.amount, submission.receiver)
 
 ## Tracking and executing claims
 
-After the submission has been confirmed, each elected validator verifies, signs it with its own private key and publishes the signature to the publicly available storage. After enough signatures were published, a call to `deBridgeGate.claim()` method may be made on the destination chain to finalize the submission and execute the message. The `claim()` methods expects a variety of args, including the contents of the submission and the signatures. To handle this step, an `evm.Claim` object exists, providing handy methods to check the status of the claim and craft a tuple of scalar args (containing encoded values) ready to be passed to the `deBridgeGate`'s `claim()` method in an unopinionated manner.
+After the submission has been confirmed, each elected validator verifies and signs it with its own private key and publishes the signature to the publicly available storage. After enough signatures have been published, a call to `deBridgeGate.claim()` method may be made on the destination chain to finalize the submission and execute the message.
+
+The `claim()` methods expects a variety of args, including the contents of the submission and the signatures. To handle this step, an `evm.Claim` object exists, providing handy methods to check the status of the claim and craft a tuple of scalar args (containing encoded values) ready to be passed to the `deBridgeGate`'s `claim()` method in an unopinionated manner.
 
 Again, the first thing to do is to construct a context with the destination chain:
 
@@ -130,7 +132,7 @@ if (isConfirmed) {
 
 ## Works with a `hardhat-debridge` emulated environment!
 
-[`hardhat-debridge`](https://github.com/debridge-finance/hardhat-debridge) is a plugin for Hardhat that provides the toolkit to test and emulate dApps built on top of deBridge protocol, and it is confirmed to be deSDK-compatible. This means that you can develop automated tests to validate how your deSDK-based scripts cooperate with deBridge infrastructure. After all, the [`hardhat-debridge`](https://github.com/debridge-finance/hardhat-debridge) itself uses deSDK under the hood and is covered with extensive tests which use the plugin and deSDK simultaneously.
+[`hardhat-debridge`](https://github.com/debridge-finance/hardhat-debridge) is a plugin for Hardhat that provides the toolkit to test and emulate dApps built on top of deBridge protocol, and it is confirmed to be deSDK-compatible. This means that you can develop automated tests to validate how your deSDK-based scripts work with the deBridge infrastructure. After all, the [`hardhat-debridge`](https://github.com/debridge-finance/hardhat-debridge) itself uses deSDK under the hood and is covered with extensive tests which use the plugin and deSDK simultaneously.
 
 By default, deSDK internals are configured to run against production environments (mainnets for all supported networks: Ethereum, Polygon, etc). To make it work against local emulated environment, craft a special `evmContext` object:
 
@@ -155,3 +157,7 @@ const message = new evm.Message(messageParams, evmLocalContext);
 const submissions = await evm.Submission.findAll(transactionHash, evmLocalContext);
 const claim = await submission.toEVMClaim(evmLocalContext);
 ```
+
+##
+
+Reach out to us on Discord if you have any questions or some feedback on the npm package. We are looking forward to seeing what type of cross-chain applications and primitives will be built with the SDK moving forward.
