@@ -15,7 +15,7 @@ import {
   ClaimAutoParams,
   Message,
 } from "../src/evm";
-import { DeBridgeGate } from "../src/evm/typechain";
+import { DeBridgeGate, IERC20__factory } from "../src/evm/typechain";
 import {
   CrossChainCounter,
   CrossChainCounter__factory,
@@ -132,7 +132,8 @@ describe("EVM: Send", function () {
       expect(1).to.be.eq(submissions.length);
 
       const [submission] = submissions;
-      expect(submission.autoParams.executionFee).to.eq(executionFee);
+      expect(submission.autoParams).is.not.undefined;
+      expect(submission.autoParams!.executionFee).to.eq(executionFee);
 
       const claim = await submission.toEVMClaim(this.evmContext);
       expect(expectedAmountAfterBridge.toString()).to.eq(claim.amount);
@@ -141,6 +142,62 @@ describe("EVM: Send", function () {
       await this.contracts.gate.claim(...claimArgs);
 
       const receiverAmountAfter = await receiver.getBalance();
+      expect(receiverAmountAfter.eq(expectedReceiverBalanceAfter)).to.equal(
+        true
+      );
+    });
+
+    it("Should transfer raw value without auto params", async function () {
+      const fee = this.contracts.gateProtocolFee;
+      const transferAmount = parseEther("1");
+
+      const [, receiver] = await hre.ethers.getSigners();
+
+      // w/o autoParams we are getting wETH
+      const weth = IERC20__factory.connect(
+        await this.contracts.gate.weth(),
+        receiver
+      );
+      const receiverBalanceBefore = await weth.balanceOf(receiver.address);
+
+      // take 10bps
+      const expectedAmountAfterBridge = transferAmount
+        .mul(10000 - 10)
+        .div(10000);
+      const expectedReceiverBalanceAfter = receiverBalanceBefore.add(
+        expectedAmountAfterBridge
+      );
+
+      const message = new Message({
+        tokenAddress: ethers.constants.AddressZero,
+        amount: transferAmount,
+        chainIdTo: hre.ethers.provider.network.chainId,
+        receiver: receiver.address,
+        autoParams: undefined, // mind empty autoparams
+      });
+
+      const txSend = await this.contracts.gate.send(
+        ...message.getEncodedArgs(),
+        { value: transferAmount.add(fee) }
+      );
+      const txReceipt = await txSend.wait();
+
+      const submissions = await Submission.findAll(
+        txReceipt.transactionHash,
+        this.evmContext
+      );
+      expect(1).to.be.eq(submissions.length);
+
+      const [submission] = submissions;
+      expect(submission.autoParams).is.undefined;
+
+      const claim = await submission.toEVMClaim(this.evmContext);
+      expect(expectedAmountAfterBridge.toString()).to.eq(claim.amount);
+
+      const claimArgs = await claim.getEncodedArgs();
+      await this.contracts.gate.claim(...claimArgs);
+
+      const receiverAmountAfter = await weth.balanceOf(receiver.address);
       expect(receiverAmountAfter.eq(expectedReceiverBalanceAfter)).to.equal(
         true
       );
