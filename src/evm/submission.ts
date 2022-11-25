@@ -124,6 +124,8 @@ async function getSentEvents(
 ): Promise<SentEvent[]> {
   const provider = getProvider(opts);
   const txReceipt = await provider.getTransactionReceipt(txHash);
+  if (!txReceipt) return [];
+
   const contract = DeBridgeGate__factory.connect(
     getDeBridgeGateAddress(opts),
     provider
