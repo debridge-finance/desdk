@@ -6,9 +6,7 @@ import {
 } from "./context";
 import { ClaimAutoParams } from "./structs";
 import { SignatureVerifier__factory } from "./typechain";
-import {
-  ClaimedEventObject,
-} from "./typechain/@debridge-finance/contracts/contracts/interfaces/IDeBridgeGate";
+import { ClaimedEventObject } from "./typechain/@debridge-finance/contracts/contracts/interfaces/IDeBridgeGate";
 
 export type ClaimArgs = [
   string,
@@ -30,7 +28,7 @@ export type TClaim = Readonly<
     readonly chainIdFrom: number;
     readonly receiver: string;
     readonly nonce: string;
-    readonly autoParams: ClaimAutoParams;
+    readonly autoParams?: ClaimAutoParams;
   }
 >;
 
@@ -85,7 +83,7 @@ export class Claim {
       this.receiver.toString(),
       this.nonce.toString(),
       "0x" + signatures.map((s) => s.replace(/^0x/, "")).join(""),
-      this.autoParams.encode(),
+      this.autoParams ? this.autoParams.encode() : "0x",
     ];
   }
 
