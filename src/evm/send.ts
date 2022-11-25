@@ -1,4 +1,5 @@
 import { BigNumberish, BytesLike } from "ethers";
+
 import { SendAutoParams } from "./structs";
 
 type SendArgs = [
@@ -20,7 +21,7 @@ type TMessage = {
   readonly permit?: BytesLike;
   readonly useAssetFee?: boolean;
   readonly referralCode?: BigNumberish;
-  readonly autoParams: SendAutoParams;
+  readonly autoParams?: SendAutoParams;
 };
 
 // tslint:disable-next-line:no-empty-interface
@@ -41,7 +42,7 @@ export class Message {
       this.permit ? this.permit.toString() : "0x",
       this.useAssetFee !== undefined ? this.useAssetFee : false,
       this.referralCode ? this.referralCode.toString() : "0",
-      this.autoParams.encode(),
+      this.autoParams ? this.autoParams.encode() : "0x",
     ];
   }
 }

@@ -20,7 +20,7 @@ export type TSubmission = Readonly<
     amount: string;
     nonce: string;
     chainIdTo: string;
-    autoParams: SendAutoParams;
+    autoParams?: SendAutoParams;
 
     originChainId: number;
     sentEvent: SentEvent;
@@ -45,7 +45,10 @@ export class Submission {
             chainIdTo: sentEvent.args.chainIdTo.toString(),
             referralCode: sentEvent.args.referralCode,
             feeParams: sentEvent.args.feeParams,
-            autoParams: SendAutoParams.decode(sentEvent.args.autoParams),
+            autoParams:
+              sentEvent.args.autoParams === "0x"
+                ? undefined
+                : SendAutoParams.decode(sentEvent.args.autoParams),
             nativeSender: sentEvent.args.nativeSender.toString(),
 
             originChainId,
@@ -104,7 +107,9 @@ export class Submission {
         chainIdFrom: this.originChainId,
         receiver: this.receiver,
         nonce: this.nonce,
-        autoParams: this.autoParams.toClaimAutoParams(this),
+        autoParams: this.autoParams
+          ? this.autoParams!.toClaimAutoParams(this)
+          : undefined,
       },
       destinationCtx
     );
