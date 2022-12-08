@@ -1,6 +1,6 @@
 {
   "name": "@debridge-finance/desdk",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Send, track and claim arbitrary cross-chain messages over the deBridge protocol programmatically",
   "repository": "github:debridge-finance/desdk",
   "author": "deBridge",
