@@ -1,11 +1,10 @@
 import { expect } from "chai";
-import { Flags } from "../src/evm/structs";
+import { Flag, Flags } from "../src/evm/structs";
 
 
 describe("Decode correct raw flag", function () {
   it("Should decode 1 to flags" , async function () {
     const flags = Flags.decode(1).getFlags();
-    console.log("1", flags);
     expect(flags).to.be.eql([0]);
   });
   it("Should decode 2 to flags" , async function () {
@@ -21,7 +20,7 @@ describe("Decode correct raw flag", function () {
     expect(flags).to.be.eql([2]);
   });
   it("Should decode 5 to flags" , async function () {
-    const flags = Flags.decode(6).getFlags();
+    const flags = Flags.decode(5).getFlags();
     expect(flags).to.be.eql([0,2]);
   });
   it("Should decode 6 to flags" , async function () {

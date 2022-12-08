@@ -50,7 +50,7 @@ export class Flags {
 
   public getFlags(): Flag[] {
     const ret: Flag[] = [];
-    Object.keys(Flag).forEach((fl) => {
+    Object.keys(Flag).filter((v) => isNaN(Number(v))).forEach((fl) => {
       const flag = Flag[fl as keyof typeof Flag];
       if (this.isSet(flag)) {
         ret.push(flag);
