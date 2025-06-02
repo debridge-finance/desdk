@@ -3,6 +3,9 @@ build
 lib
 lib.esm
 
+src/evm/typechain
+test/fixture/typechain
+
 # Logs
 logs
 *.log

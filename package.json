@@ -17,11 +17,15 @@
   "scripts": {
     "lint:fix": "prettier --write 'src/**/*.{js,ts}' 'test/**/*.{js,ts}' && tslint --fix --config tslint.json --project tsconfig.json",
     "lint": "tslint --config tslint.json --project tsconfig.json",
+    "pretest": "cd test/fixture && hardhat clean && hardhat compile && npm run prebuild",
+    "test:clean":  "cd test/fixture && hardhat clean",
     "test": "mocha --exit --recursive 'test/**/*.test.ts'",
-    "clean": "rm -rf build",
+    "clean": "npm run test:clean && npm run build:clean",
     "build-cjs": "tsc --build tsconfig.json",
     "build-esm": "tsc --build tsconfig-esm.json",
-    "build": "npm-run-all clean build-*",
+    "prebuild": "npm-run-all clean && hardhat compile",
+    "build": "npm-run-all build-*",
+    "build:clean": "rm -rf build && hardhat clean",
     "prepublishOnly": "npm run build",
     "prepare": "npm run build"
   },
