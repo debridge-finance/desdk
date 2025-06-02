@@ -1,0 +1,22 @@
+name: Lint and tests
+on: [push]
+
+jobs:
+  build:
+    name: Test
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.4.1'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+
+      - name: Linter
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
