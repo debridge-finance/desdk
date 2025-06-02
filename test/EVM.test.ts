@@ -1,7 +1,7 @@
-import { expect } from "chai";
-import { BigNumber, ethers } from "ethers";
-import { parseEther } from "ethers/lib/utils";
 import hre from "hardhat";
+import "@nomicfoundation/hardhat-ethers";
+import { expect } from "chai";
+import { ethers, parseEther } from "ethers";
 import { describe } from "mocha";
 
 import {
@@ -27,7 +27,7 @@ import { deployGate } from "./lib";
 
 interface TestSuiteState {
   gate: DeBridgeGate;
-  gateProtocolFee: BigNumber;
+  gateProtocolFee: bigint;
   counter: CrossChainCounter;
   incrementor: CrossChainIncrementor;
 }
@@ -35,16 +35,16 @@ interface TestSuiteState {
 declare module "mocha" {
   export interface Context {
     contracts: TestSuiteState;
-    tx: ethers.providers.TransactionReceipt;
+    tx: ethers.TransactionReceipt;
     submissions: Submission[];
-    validators: ethers.Signer[];
+    validators: Awaited<ReturnType<typeof hre.ethers.getSigners>>;
     evmContext: EVMContext;
   }
 }
 
 // Creates a set of contracts for each test suite (useful for before() and beforeEach())
 async function deployContracts(
-  signers: ethers.Signer[]
+  signers: Awaited<ReturnType<typeof hre.ethers.getSigners>>
 ): Promise<TestSuiteState> {
   const gate = await deployGate({
     validators: signers,
@@ -53,20 +53,20 @@ async function deployContracts(
   const [deployer] = await hre.ethers.getSigners();
 
   const Counter = await new CrossChainCounter__factory().connect(deployer);
-  const counter = await Counter.deploy(gate.address);
+  const counter = await Counter.deploy(gate.getAddress());
 
   const Incrementor = await new CrossChainIncrementor__factory().connect(
     deployer
   );
   const incrementor = await Incrementor.deploy(
-    gate.address,
-    hre.ethers.provider.network.chainId,
-    counter.address
+    gate.getAddress(),
+    (await hre.ethers.provider.getNetwork()).chainId,
+    counter.getAddress()
   );
 
   await counter.addChainSupport(
-    hre.ethers.provider.network.chainId,
-    incrementor.address
+    (await hre.ethers.provider.getNetwork()).chainId,
+    await incrementor.getAddress()
   );
 
   return {
@@ -85,7 +85,7 @@ describe("EVM: Send", function () {
       this.contracts = await deployContracts(this.validators);
       this.evmContext = {
         provider: hre,
-        deBridgeGateAddress: this.contracts.gate.address,
+        deBridgeGateAddress: await this.contracts.gate.getAddress(),
         signatureStorage: new SignersSignatureStorage(this.validators),
       };
     });
@@ -93,23 +93,23 @@ describe("EVM: Send", function () {
     it("Should transfer", async function () {
       const fee = this.contracts.gateProtocolFee;
       const transferAmount = parseEther("1");
-      const executionFee = parseEther("0.1").toString();
+      const executionFee = parseEther("0.1");
 
       const [, receiver] = await hre.ethers.getSigners();
-      const receiverBalanceBefore = await receiver.getBalance();
+      const receiverBalanceBefore = await hre.ethers.provider.getBalance(receiver.getAddress());
       // take 10bps and exfee
       const expectedAmountAfterBridge = transferAmount
-        .mul(10000 - 10)
-        .div(10000)
-        .sub(executionFee);
-      const expectedReceiverBalanceAfter = receiverBalanceBefore.add(
+        *(10000n - 10n)
+        /(10000n)
+        -(executionFee);
+      const expectedReceiverBalanceAfter = receiverBalanceBefore +(
         expectedAmountAfterBridge
       );
 
       const message = new Message({
-        tokenAddress: ethers.constants.AddressZero,
+        tokenAddress: ethers.ZeroAddress,
         amount: transferAmount,
-        chainIdTo: hre.ethers.provider.network.chainId,
+        chainIdTo: (await hre.ethers.provider.getNetwork()).chainId,
         receiver: receiver.address,
         autoParams: new SendAutoParams({
           executionFee,
@@ -121,12 +121,12 @@ describe("EVM: Send", function () {
 
       const txSend = await this.contracts.gate.send(
         ...message.getEncodedArgs(),
-        { value: transferAmount.add(fee) }
+        { value: transferAmount + (fee) }
       );
       const txReceipt = await txSend.wait();
 
       const submissions = await Submission.findAll(
-        txReceipt.transactionHash,
+        txReceipt?.hash!,
         this.evmContext
       );
       expect(1).to.be.eq(submissions.length);
@@ -141,9 +141,9 @@ describe("EVM: Send", function () {
       const claimArgs = await claim.getEncodedArgs();
       await this.contracts.gate.claim(...claimArgs);
 
-      const receiverAmountAfter = await receiver.getBalance();
-      expect(receiverAmountAfter.eq(expectedReceiverBalanceAfter)).to.equal(
-        true
+      const receiverAmountAfter = await hre.ethers.provider.getBalance(receiver.getAddress());
+      expect(receiverAmountAfter).to.equal(
+        expectedReceiverBalanceAfter
       );
     });
 
@@ -162,28 +162,28 @@ describe("EVM: Send", function () {
 
       // take 10bps
       const expectedAmountAfterBridge = transferAmount
-        .mul(10000 - 10)
-        .div(10000);
-      const expectedReceiverBalanceAfter = receiverBalanceBefore.add(
+        *(10000n - 10n)
+        /(10000n);
+      const expectedReceiverBalanceAfter = receiverBalanceBefore + (
         expectedAmountAfterBridge
       );
 
       const message = new Message({
-        tokenAddress: ethers.constants.AddressZero,
+        tokenAddress: ethers.ZeroAddress,
         amount: transferAmount,
-        chainIdTo: hre.ethers.provider.network.chainId,
+        chainIdTo: (await hre.ethers.provider.getNetwork()).chainId,
         receiver: receiver.address,
         autoParams: undefined, // mind empty autoparams
       });
 
       const txSend = await this.contracts.gate.send(
         ...message.getEncodedArgs(),
-        { value: transferAmount.add(fee) }
+        { value: transferAmount + (fee) }
       );
       const txReceipt = await txSend.wait();
 
       const submissions = await Submission.findAll(
-        txReceipt.transactionHash,
+        txReceipt?.hash!,
         this.evmContext
       );
       expect(1).to.be.eq(submissions.length);
@@ -198,7 +198,7 @@ describe("EVM: Send", function () {
       await this.contracts.gate.claim(...claimArgs);
 
       const receiverAmountAfter = await weth.balanceOf(receiver.address);
-      expect(receiverAmountAfter.eq(expectedReceiverBalanceAfter)).to.equal(
+      expect(receiverAmountAfter === (expectedReceiverBalanceAfter)).to.equal(
         true
       );
     });
@@ -206,7 +206,7 @@ describe("EVM: Send", function () {
 });
 
 describe("EVM: General flow", function () {
-  const INCREMENT_BY = 10;
+  const INCREMENT_BY = 10n;
 
   before(async function () {
     const signers = await hre.ethers.getSigners();
@@ -214,18 +214,18 @@ describe("EVM: General flow", function () {
     this.contracts = await deployContracts(this.validators);
     this.evmContext = {
       provider: hre,
-      deBridgeGateAddress: this.contracts.gate.address,
+      deBridgeGateAddress: await this.contracts.gate.getAddress(),
       signatureStorage: new SignersSignatureStorage(this.validators),
     };
     const tx = await this.contracts.incrementor.increment(INCREMENT_BY, {
       value: this.contracts.gateProtocolFee,
     });
-    this.tx = await tx.wait();
+    this.tx = (await tx.wait())!;
   });
 
   it("Must capture one submission", async function () {
     const submissions = await Submission.findAll(
-      this.tx.transactionHash,
+      this.tx.hash,
       this.evmContext
     );
 
@@ -266,21 +266,21 @@ describe("EVM: General flow: multiple submissions per one txn", function () {
     this.contracts = await deployContracts(this.validators);
     this.evmContext = {
       provider: hre,
-      deBridgeGateAddress: this.contracts.gate.address,
+      deBridgeGateAddress: await this.contracts.gate.getAddress(),
       signatureStorage: new SignersSignatureStorage(this.validators),
     };
     const tx = await this.contracts.incrementor.incrementMulti(
       [INCREMENT_BY, INCREMENT_BY * 2, INCREMENT_BY * 3],
       {
-        value: this.contracts.gateProtocolFee.mul(3),
+        value: this.contracts.gateProtocolFee * 3n,
       }
     );
-    this.tx = await tx.wait();
+    this.tx = (await tx.wait())!;
   });
 
   it("Must capture multiple submissions", async function () {
     this.submissions = await Submission.findAll(
-      this.tx.transactionHash,
+      this.tx.hash,
       this.evmContext
     );
 
@@ -289,23 +289,23 @@ describe("EVM: General flow: multiple submissions per one txn", function () {
 
   for (let i = 0; i < 3; i++) {
     it(`Must claim #${i + 1}`, async function () {
-      const preCounterValue = (
+      const preCounterValue = Number(
         await this.contracts.counter.counter()
-      ).toNumber();
+      );
 
       const claim = await this.submissions[i].toEVMClaim(this.evmContext);
       const args = await claim.getEncodedArgs();
 
       await this.contracts.gate.claim(...args);
 
-      expect(await this.contracts.counter.counter()).to.be.eq(
+      expect(Number(await this.contracts.counter.counter())).to.be.eq(
         preCounterValue + INCREMENT_BY * (i + 1)
       );
     });
   }
 
   it("Check final value of the counter", async function () {
-    expect(await this.contracts.counter.counter()).to.be.eq(
+    expect(Number(await this.contracts.counter.counter())).to.be.eq(
       INCREMENT_BY + INCREMENT_BY * 2 + INCREMENT_BY * 3
     );
   });
@@ -313,7 +313,7 @@ describe("EVM: General flow: multiple submissions per one txn", function () {
 
 describe("EVM: structs", function () {
   const SEND_AUTOPARAMS = {
-    executionFee: "0",
+    executionFee: 0n,
     flags: Flags.decode(6),
     fallbackAddress: "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
     data: "0xcca5afd4000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266",
@@ -321,7 +321,7 @@ describe("EVM: structs", function () {
   const SEND_AUTOPARAMS_RAW =
     "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000014f39fd6e51aad88f6f4ce6ab8827279cfffb922660000000000000000000000000000000000000000000000000000000000000000000000000000000000000044cca5afd4000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb9226600000000000000000000000000000000000000000000000000000000";
   const CLAIM_AUTOPARAMS = {
-    executionFee: "0",
+    executionFee: 0n,
     flags: Flags.decode(6),
     fallbackAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
     data: "0xcca5afd4000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266",

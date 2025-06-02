@@ -1,5 +1,4 @@
 import { BytesLike, ethers } from "ethers";
-
 import { SubmissionStatus } from "./submission";
 
 type DeBridgeApiGetFullSubmissionInfoResponse = {
@@ -39,16 +38,15 @@ export class FixedSignatureStorage implements ISignatureStorage {
     return this._signatures;
   }
 }
-
 export class SignersSignatureStorage implements ISignatureStorage {
-  constructor(private _signers: ethers.Signer[]) {}
+  constructor(private _signers: any[]) {}
 
   async getSignatures(submissionId: BytesLike): Promise<string[]> {
     const signatures = [];
 
     // see the note: https://docs.ethers.io/v5/api/signer/#Signer-signMessage
     // submissionId is a string (0x12[...]), but we must sign the bytes
-    const bytesToSign = ethers.utils.arrayify(submissionId);
+    const bytesToSign = ethers.getBytes(submissionId);
 
     for (const signer of this._signers) {
       const signature = await signer.signMessage(bytesToSign);

@@ -2,8 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { Contract, Interface, type ContractRunner } from "ethers";
 import type {
   ICallProxy,
   ICallProxyInterface,
@@ -129,17 +128,14 @@ const _abi = [
     stateMutability: "nonpayable",
     type: "function",
   },
-];
+] as const;
 
 export class ICallProxy__factory {
   static readonly abi = _abi;
   static createInterface(): ICallProxyInterface {
-    return new utils.Interface(_abi) as ICallProxyInterface;
+    return new Interface(_abi) as ICallProxyInterface;
   }
-  static connect(
-    address: string,
-    signerOrProvider: Signer | Provider
-  ): ICallProxy {
-    return new Contract(address, _abi, signerOrProvider) as ICallProxy;
+  static connect(address: string, runner?: ContractRunner | null): ICallProxy {
+    return new Contract(address, _abi, runner) as unknown as ICallProxy;
   }
 }

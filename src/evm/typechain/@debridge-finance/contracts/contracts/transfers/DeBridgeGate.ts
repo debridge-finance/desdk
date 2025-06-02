@@ -3,165 +3,87 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BigNumberish,
   BytesLike,
-  CallOverrides,
-  ContractTransaction,
-  Overrides,
-  PayableOverrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
-} from "ethers";
-import type {
   FunctionFragment,
   Result,
+  Interface,
   EventFragment,
-} from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
+  AddressLike,
+  ContractRunner,
+  ContractMethod,
+  Listener,
+} from "ethers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
+  TypedLogDescription,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "../../../../common";
 
 export declare namespace IDeBridgeGate {
   export type ChainSupportInfoStruct = {
-    fixedNativeFee: PromiseOrValue<BigNumberish>;
-    isSupported: PromiseOrValue<boolean>;
-    transferFeeBps: PromiseOrValue<BigNumberish>;
+    fixedNativeFee: BigNumberish;
+    isSupported: boolean;
+    transferFeeBps: BigNumberish;
   };
 
-  export type ChainSupportInfoStructOutput = [BigNumber, boolean, number] & {
-    fixedNativeFee: BigNumber;
-    isSupported: boolean;
-    transferFeeBps: number;
-  };
+  export type ChainSupportInfoStructOutput = [
+    fixedNativeFee: bigint,
+    isSupported: boolean,
+    transferFeeBps: bigint
+  ] & { fixedNativeFee: bigint; isSupported: boolean; transferFeeBps: bigint };
 
   export type FeeParamsStruct = {
-    receivedAmount: PromiseOrValue<BigNumberish>;
-    fixFee: PromiseOrValue<BigNumberish>;
-    transferFee: PromiseOrValue<BigNumberish>;
-    useAssetFee: PromiseOrValue<boolean>;
-    isNativeToken: PromiseOrValue<boolean>;
+    receivedAmount: BigNumberish;
+    fixFee: BigNumberish;
+    transferFee: BigNumberish;
+    useAssetFee: boolean;
+    isNativeToken: boolean;
   };
 
   export type FeeParamsStructOutput = [
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    boolean,
-    boolean
+    receivedAmount: bigint,
+    fixFee: bigint,
+    transferFee: bigint,
+    useAssetFee: boolean,
+    isNativeToken: boolean
   ] & {
-    receivedAmount: BigNumber;
-    fixFee: BigNumber;
-    transferFee: BigNumber;
+    receivedAmount: bigint;
+    fixFee: bigint;
+    transferFee: bigint;
     useAssetFee: boolean;
     isNativeToken: boolean;
   };
 
   export type SubmissionAutoParamsFromStruct = {
-    executionFee: PromiseOrValue<BigNumberish>;
-    flags: PromiseOrValue<BigNumberish>;
-    fallbackAddress: PromiseOrValue<string>;
-    data: PromiseOrValue<BytesLike>;
-    nativeSender: PromiseOrValue<BytesLike>;
+    executionFee: BigNumberish;
+    flags: BigNumberish;
+    fallbackAddress: AddressLike;
+    data: BytesLike;
+    nativeSender: BytesLike;
   };
 
   export type SubmissionAutoParamsFromStructOutput = [
-    BigNumber,
-    BigNumber,
-    string,
-    string,
-    string
+    executionFee: bigint,
+    flags: bigint,
+    fallbackAddress: string,
+    data: string,
+    nativeSender: string
   ] & {
-    executionFee: BigNumber;
-    flags: BigNumber;
+    executionFee: bigint;
+    flags: bigint;
     fallbackAddress: string;
     data: string;
     nativeSender: string;
   };
 }
 
-export interface DeBridgeGateInterface extends utils.Interface {
-  functions: {
-    "BPS_DENOMINATOR()": FunctionFragment;
-    "DEFAULT_ADMIN_ROLE()": FunctionFragment;
-    "DEPLOY_PREFIX()": FunctionFragment;
-    "GOVMONITORING_ROLE()": FunctionFragment;
-    "SUBMISSION_PREFIX()": FunctionFragment;
-    "autoUpdateFixedNativeFee(uint256)": FunctionFragment;
-    "blockSubmission(bytes32[],bool)": FunctionFragment;
-    "callProxy()": FunctionFragment;
-    "claim(bytes32,uint256,uint256,address,uint256,bytes,bytes)": FunctionFragment;
-    "deBridgeTokenDeployer()": FunctionFragment;
-    "defiController()": FunctionFragment;
-    "deployNewAsset(bytes,uint256,string,string,uint8,bytes)": FunctionFragment;
-    "excessConfirmations()": FunctionFragment;
-    "feeContractUpdater()": FunctionFragment;
-    "feeDiscount(address)": FunctionFragment;
-    "feeProxy()": FunctionFragment;
-    "flash(address,address,uint256,bytes)": FunctionFragment;
-    "flashFeeBps()": FunctionFragment;
-    "getAmountThreshold(bytes32)": FunctionFragment;
-    "getChainFromConfig(uint256)": FunctionFragment;
-    "getChainId()": FunctionFragment;
-    "getChainToConfig(uint256)": FunctionFragment;
-    "getDebridge(bytes32)": FunctionFragment;
-    "getDebridgeChainAssetFixedFee(bytes32,uint256)": FunctionFragment;
-    "getDebridgeFeeInfo(bytes32)": FunctionFragment;
-    "getDebridgeId(uint256,address)": FunctionFragment;
-    "getDefiAvaliableReserves(address)": FunctionFragment;
-    "getDeployId(bytes32,string,string,uint8)": FunctionFragment;
-    "getNativeInfo(address)": FunctionFragment;
-    "getRoleAdmin(bytes32)": FunctionFragment;
-    "getSubmissionIdFrom(bytes32,uint256,uint256,address,uint256,(uint256,uint256,address,bytes,bytes),bool,address)": FunctionFragment;
-    "getbDebridgeId(uint256,bytes)": FunctionFragment;
-    "globalFixedNativeFee()": FunctionFragment;
-    "globalTransferFeeBps()": FunctionFragment;
-    "grantRole(bytes32,address)": FunctionFragment;
-    "hasRole(bytes32,address)": FunctionFragment;
-    "initialize(uint8,address)": FunctionFragment;
-    "isBlockedSubmission(bytes32)": FunctionFragment;
-    "isSubmissionUsed(bytes32)": FunctionFragment;
-    "lockedClaim()": FunctionFragment;
-    "nonce()": FunctionFragment;
-    "pause()": FunctionFragment;
-    "paused()": FunctionFragment;
-    "renounceRole(bytes32,address)": FunctionFragment;
-    "requestReserves(address,uint256)": FunctionFragment;
-    "returnReserves(address,uint256)": FunctionFragment;
-    "revokeRole(bytes32,address)": FunctionFragment;
-    "send(address,uint256,uint256,bytes,bytes,bool,uint32,bytes)": FunctionFragment;
-    "setCallProxy(address)": FunctionFragment;
-    "setChainSupport(uint256,bool,bool)": FunctionFragment;
-    "setDeBridgeTokenDeployer(address)": FunctionFragment;
-    "setDefiController(address)": FunctionFragment;
-    "setFeeContractUpdater(address)": FunctionFragment;
-    "setFeeProxy(address)": FunctionFragment;
-    "setSignatureVerifier(address)": FunctionFragment;
-    "setWethGate(address)": FunctionFragment;
-    "signatureVerifier()": FunctionFragment;
-    "supportsInterface(bytes4)": FunctionFragment;
-    "unpause()": FunctionFragment;
-    "updateAsset(bytes32,uint256,uint16,uint256)": FunctionFragment;
-    "updateAssetFixedFees(bytes32,uint256[],uint256[])": FunctionFragment;
-    "updateChainSupport(uint256[],(uint256,bool,uint16)[],bool)": FunctionFragment;
-    "updateExcessConfirmations(uint8)": FunctionFragment;
-    "updateFeeDiscount(address,uint16,uint16)": FunctionFragment;
-    "updateFlashFee(uint256)": FunctionFragment;
-    "updateGlobalFee(uint256,uint16)": FunctionFragment;
-    "version()": FunctionFragment;
-    "weth()": FunctionFragment;
-    "wethGate()": FunctionFragment;
-    "withdrawFee(bytes32)": FunctionFragment;
-  };
-
+export interface DeBridgeGateInterface extends Interface {
   getFunction(
-    nameOrSignatureOrTopic:
+    nameOrSignature:
       | "BPS_DENOMINATOR"
       | "DEFAULT_ADMIN_ROLE"
       | "DEPLOY_PREFIX"
@@ -234,6 +156,31 @@ export interface DeBridgeGateInterface extends utils.Interface {
       | "withdrawFee"
   ): FunctionFragment;
 
+  getEvent(
+    nameOrSignatureOrTopic:
+      | "AutoRequestExecuted"
+      | "Blocked"
+      | "CallProxyUpdated"
+      | "ChainSupportUpdated"
+      | "ChainsSupportUpdated"
+      | "Claimed"
+      | "FixedNativeFeeAutoUpdated"
+      | "FixedNativeFeeUpdated"
+      | "Flash"
+      | "Initialized"
+      | "MonitoringClaimEvent"
+      | "MonitoringSendEvent"
+      | "PairAdded"
+      | "Paused"
+      | "RoleAdminChanged"
+      | "RoleGranted"
+      | "RoleRevoked"
+      | "Sent"
+      | "Unblocked"
+      | "Unpaused"
+      | "WithdrawnFee"
+  ): EventFragment;
+
   encodeFunctionData(
     functionFragment: "BPS_DENOMINATOR",
     values?: undefined
@@ -256,23 +203,23 @@ export interface DeBridgeGateInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "autoUpdateFixedNativeFee",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "blockSubmission",
-    values: [PromiseOrValue<BytesLike>[], PromiseOrValue<boolean>]
+    values: [BytesLike[], boolean]
   ): string;
   encodeFunctionData(functionFragment: "callProxy", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "claim",
     values: [
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BytesLike>
+      BytesLike,
+      BigNumberish,
+      BigNumberish,
+      AddressLike,
+      BigNumberish,
+      BytesLike,
+      BytesLike
     ]
   ): string;
   encodeFunctionData(
@@ -285,14 +232,7 @@ export interface DeBridgeGateInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "deployNewAsset",
-    values: [
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>
-    ]
+    values: [BytesLike, BigNumberish, string, string, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "excessConfirmations",
@@ -304,17 +244,12 @@ export interface DeBridgeGateInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "feeDiscount",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "feeProxy", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "flash",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>
-    ]
+    values: [AddressLike, AddressLike, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "flashFeeBps",
@@ -322,11 +257,11 @@ export interface DeBridgeGateInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getAmountThreshold",
-    values: [PromiseOrValue<BytesLike>]
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getChainFromConfig",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getChainId",
@@ -334,61 +269,56 @@ export interface DeBridgeGateInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getChainToConfig",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getDebridge",
-    values: [PromiseOrValue<BytesLike>]
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getDebridgeChainAssetFixedFee",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<BigNumberish>]
+    values: [BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getDebridgeFeeInfo",
-    values: [PromiseOrValue<BytesLike>]
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getDebridgeId",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
+    values: [BigNumberish, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getDefiAvaliableReserves",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getDeployId",
-    values: [
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BytesLike, string, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getNativeInfo",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
-    values: [PromiseOrValue<BytesLike>]
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getSubmissionIdFrom",
     values: [
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
+      BytesLike,
+      BigNumberish,
+      BigNumberish,
+      AddressLike,
+      BigNumberish,
       IDeBridgeGate.SubmissionAutoParamsFromStruct,
-      PromiseOrValue<boolean>,
-      PromiseOrValue<string>
+      boolean,
+      AddressLike
     ]
   ): string;
   encodeFunctionData(
     functionFragment: "getbDebridgeId",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BytesLike>]
+    values: [BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "globalFixedNativeFee",
@@ -400,23 +330,23 @@ export interface DeBridgeGateInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "grantRole",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+    values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "hasRole",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+    values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
+    values: [BigNumberish, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "isBlockedSubmission",
-    values: [PromiseOrValue<BytesLike>]
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "isSubmissionUsed",
-    values: [PromiseOrValue<BytesLike>]
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "lockedClaim",
@@ -427,68 +357,64 @@ export interface DeBridgeGateInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceRole",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+    values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "requestReserves",
-    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "returnReserves",
-    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "revokeRole",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+    values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "send",
     values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<boolean>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>
+      AddressLike,
+      BigNumberish,
+      BigNumberish,
+      BytesLike,
+      BytesLike,
+      boolean,
+      BigNumberish,
+      BytesLike
     ]
   ): string;
   encodeFunctionData(
     functionFragment: "setCallProxy",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setChainSupport",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<boolean>,
-      PromiseOrValue<boolean>
-    ]
+    values: [BigNumberish, boolean, boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "setDeBridgeTokenDeployer",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setDefiController",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setFeeContractUpdater",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setFeeProxy",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setSignatureVerifier",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setWethGate",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "signatureVerifier",
@@ -496,60 +422,43 @@ export interface DeBridgeGateInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
-    values: [PromiseOrValue<BytesLike>]
+    values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "updateAsset",
-    values: [
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BytesLike, BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "updateAssetFixedFees",
-    values: [
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>[],
-      PromiseOrValue<BigNumberish>[]
-    ]
+    values: [BytesLike, BigNumberish[], BigNumberish[]]
   ): string;
   encodeFunctionData(
     functionFragment: "updateChainSupport",
-    values: [
-      PromiseOrValue<BigNumberish>[],
-      IDeBridgeGate.ChainSupportInfoStruct[],
-      PromiseOrValue<boolean>
-    ]
+    values: [BigNumberish[], IDeBridgeGate.ChainSupportInfoStruct[], boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "updateExcessConfirmations",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "updateFeeDiscount",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [AddressLike, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "updateFlashFee",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "updateGlobalFee",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
   encodeFunctionData(functionFragment: "weth", values?: undefined): string;
   encodeFunctionData(functionFragment: "wethGate", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "withdrawFee",
-    values: [PromiseOrValue<BytesLike>]
+    values: [BytesLike]
   ): string;
 
   decodeFunctionResult(
@@ -781,2339 +690,1678 @@ export interface DeBridgeGateInterface extends utils.Interface {
     functionFragment: "withdrawFee",
     data: BytesLike
   ): Result;
-
-  events: {
-    "AutoRequestExecuted(bytes32,bool,address)": EventFragment;
-    "Blocked(bytes32)": EventFragment;
-    "CallProxyUpdated(address)": EventFragment;
-    "ChainSupportUpdated(uint256,bool,bool)": EventFragment;
-    "ChainsSupportUpdated(uint256,tuple,bool)": EventFragment;
-    "Claimed(bytes32,bytes32,uint256,address,uint256,uint256,bytes,bool)": EventFragment;
-    "FixedNativeFeeAutoUpdated(uint256)": EventFragment;
-    "FixedNativeFeeUpdated(uint256,uint256)": EventFragment;
-    "Flash(address,address,address,uint256,uint256)": EventFragment;
-    "Initialized(uint8)": EventFragment;
-    "MonitoringClaimEvent(bytes32,uint256,uint256)": EventFragment;
-    "MonitoringSendEvent(bytes32,uint256,uint256,uint256)": EventFragment;
-    "PairAdded(bytes32,address,bytes,uint256,uint256,uint16)": EventFragment;
-    "Paused(address)": EventFragment;
-    "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
-    "RoleGranted(bytes32,address,address)": EventFragment;
-    "RoleRevoked(bytes32,address,address)": EventFragment;
-    "Sent(bytes32,bytes32,uint256,bytes,uint256,uint256,uint32,tuple,bytes,address)": EventFragment;
-    "Unblocked(bytes32)": EventFragment;
-    "Unpaused(address)": EventFragment;
-    "WithdrawnFee(bytes32,uint256)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "AutoRequestExecuted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Blocked"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "CallProxyUpdated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ChainSupportUpdated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ChainsSupportUpdated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Claimed"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "FixedNativeFeeAutoUpdated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "FixedNativeFeeUpdated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Flash"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "MonitoringClaimEvent"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "MonitoringSendEvent"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "PairAdded"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Sent"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Unblocked"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "WithdrawnFee"): EventFragment;
 }
 
-export interface AutoRequestExecutedEventObject {
-  submissionId: string;
-  success: boolean;
-  callProxy: string;
+export namespace AutoRequestExecutedEvent {
+  export type InputTuple = [
+    submissionId: BytesLike,
+    success: boolean,
+    callProxy: AddressLike
+  ];
+  export type OutputTuple = [
+    submissionId: string,
+    success: boolean,
+    callProxy: string
+  ];
+  export interface OutputObject {
+    submissionId: string;
+    success: boolean;
+    callProxy: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type AutoRequestExecutedEvent = TypedEvent<
-  [string, boolean, string],
-  AutoRequestExecutedEventObject
->;
 
-export type AutoRequestExecutedEventFilter =
-  TypedEventFilter<AutoRequestExecutedEvent>;
-
-export interface BlockedEventObject {
-  submissionId: string;
+export namespace BlockedEvent {
+  export type InputTuple = [submissionId: BytesLike];
+  export type OutputTuple = [submissionId: string];
+  export interface OutputObject {
+    submissionId: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type BlockedEvent = TypedEvent<[string], BlockedEventObject>;
 
-export type BlockedEventFilter = TypedEventFilter<BlockedEvent>;
-
-export interface CallProxyUpdatedEventObject {
-  callProxy: string;
+export namespace CallProxyUpdatedEvent {
+  export type InputTuple = [callProxy: AddressLike];
+  export type OutputTuple = [callProxy: string];
+  export interface OutputObject {
+    callProxy: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type CallProxyUpdatedEvent = TypedEvent<
-  [string],
-  CallProxyUpdatedEventObject
->;
 
-export type CallProxyUpdatedEventFilter =
-  TypedEventFilter<CallProxyUpdatedEvent>;
-
-export interface ChainSupportUpdatedEventObject {
-  chainId: BigNumber;
-  isSupported: boolean;
-  isChainFrom: boolean;
+export namespace ChainSupportUpdatedEvent {
+  export type InputTuple = [
+    chainId: BigNumberish,
+    isSupported: boolean,
+    isChainFrom: boolean
+  ];
+  export type OutputTuple = [
+    chainId: bigint,
+    isSupported: boolean,
+    isChainFrom: boolean
+  ];
+  export interface OutputObject {
+    chainId: bigint;
+    isSupported: boolean;
+    isChainFrom: boolean;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type ChainSupportUpdatedEvent = TypedEvent<
-  [BigNumber, boolean, boolean],
-  ChainSupportUpdatedEventObject
->;
 
-export type ChainSupportUpdatedEventFilter =
-  TypedEventFilter<ChainSupportUpdatedEvent>;
-
-export interface ChainsSupportUpdatedEventObject {
-  chainIds: BigNumber;
-  chainSupportInfo: IDeBridgeGate.ChainSupportInfoStructOutput;
-  isChainFrom: boolean;
+export namespace ChainsSupportUpdatedEvent {
+  export type InputTuple = [
+    chainIds: BigNumberish,
+    chainSupportInfo: IDeBridgeGate.ChainSupportInfoStruct,
+    isChainFrom: boolean
+  ];
+  export type OutputTuple = [
+    chainIds: bigint,
+    chainSupportInfo: IDeBridgeGate.ChainSupportInfoStructOutput,
+    isChainFrom: boolean
+  ];
+  export interface OutputObject {
+    chainIds: bigint;
+    chainSupportInfo: IDeBridgeGate.ChainSupportInfoStructOutput;
+    isChainFrom: boolean;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type ChainsSupportUpdatedEvent = TypedEvent<
-  [BigNumber, IDeBridgeGate.ChainSupportInfoStructOutput, boolean],
-  ChainsSupportUpdatedEventObject
->;
 
-export type ChainsSupportUpdatedEventFilter =
-  TypedEventFilter<ChainsSupportUpdatedEvent>;
-
-export interface ClaimedEventObject {
-  submissionId: string;
-  debridgeId: string;
-  amount: BigNumber;
-  receiver: string;
-  nonce: BigNumber;
-  chainIdFrom: BigNumber;
-  autoParams: string;
-  isNativeToken: boolean;
+export namespace ClaimedEvent {
+  export type InputTuple = [
+    submissionId: BytesLike,
+    debridgeId: BytesLike,
+    amount: BigNumberish,
+    receiver: AddressLike,
+    nonce: BigNumberish,
+    chainIdFrom: BigNumberish,
+    autoParams: BytesLike,
+    isNativeToken: boolean
+  ];
+  export type OutputTuple = [
+    submissionId: string,
+    debridgeId: string,
+    amount: bigint,
+    receiver: string,
+    nonce: bigint,
+    chainIdFrom: bigint,
+    autoParams: string,
+    isNativeToken: boolean
+  ];
+  export interface OutputObject {
+    submissionId: string;
+    debridgeId: string;
+    amount: bigint;
+    receiver: string;
+    nonce: bigint;
+    chainIdFrom: bigint;
+    autoParams: string;
+    isNativeToken: boolean;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type ClaimedEvent = TypedEvent<
-  [string, string, BigNumber, string, BigNumber, BigNumber, string, boolean],
-  ClaimedEventObject
->;
 
-export type ClaimedEventFilter = TypedEventFilter<ClaimedEvent>;
-
-export interface FixedNativeFeeAutoUpdatedEventObject {
-  globalFixedNativeFee: BigNumber;
+export namespace FixedNativeFeeAutoUpdatedEvent {
+  export type InputTuple = [globalFixedNativeFee: BigNumberish];
+  export type OutputTuple = [globalFixedNativeFee: bigint];
+  export interface OutputObject {
+    globalFixedNativeFee: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type FixedNativeFeeAutoUpdatedEvent = TypedEvent<
-  [BigNumber],
-  FixedNativeFeeAutoUpdatedEventObject
->;
 
-export type FixedNativeFeeAutoUpdatedEventFilter =
-  TypedEventFilter<FixedNativeFeeAutoUpdatedEvent>;
-
-export interface FixedNativeFeeUpdatedEventObject {
-  globalFixedNativeFee: BigNumber;
-  globalTransferFeeBps: BigNumber;
+export namespace FixedNativeFeeUpdatedEvent {
+  export type InputTuple = [
+    globalFixedNativeFee: BigNumberish,
+    globalTransferFeeBps: BigNumberish
+  ];
+  export type OutputTuple = [
+    globalFixedNativeFee: bigint,
+    globalTransferFeeBps: bigint
+  ];
+  export interface OutputObject {
+    globalFixedNativeFee: bigint;
+    globalTransferFeeBps: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type FixedNativeFeeUpdatedEvent = TypedEvent<
-  [BigNumber, BigNumber],
-  FixedNativeFeeUpdatedEventObject
->;
 
-export type FixedNativeFeeUpdatedEventFilter =
-  TypedEventFilter<FixedNativeFeeUpdatedEvent>;
-
-export interface FlashEventObject {
-  sender: string;
-  tokenAddress: string;
-  receiver: string;
-  amount: BigNumber;
-  paid: BigNumber;
+export namespace FlashEvent {
+  export type InputTuple = [
+    sender: AddressLike,
+    tokenAddress: AddressLike,
+    receiver: AddressLike,
+    amount: BigNumberish,
+    paid: BigNumberish
+  ];
+  export type OutputTuple = [
+    sender: string,
+    tokenAddress: string,
+    receiver: string,
+    amount: bigint,
+    paid: bigint
+  ];
+  export interface OutputObject {
+    sender: string;
+    tokenAddress: string;
+    receiver: string;
+    amount: bigint;
+    paid: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type FlashEvent = TypedEvent<
-  [string, string, string, BigNumber, BigNumber],
-  FlashEventObject
->;
 
-export type FlashEventFilter = TypedEventFilter<FlashEvent>;
-
-export interface InitializedEventObject {
-  version: number;
+export namespace InitializedEvent {
+  export type InputTuple = [version: BigNumberish];
+  export type OutputTuple = [version: bigint];
+  export interface OutputObject {
+    version: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
 
-export type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
-
-export interface MonitoringClaimEventEventObject {
-  submissionId: string;
-  lockedOrMintedAmount: BigNumber;
-  totalSupply: BigNumber;
+export namespace MonitoringClaimEventEvent {
+  export type InputTuple = [
+    submissionId: BytesLike,
+    lockedOrMintedAmount: BigNumberish,
+    totalSupply: BigNumberish
+  ];
+  export type OutputTuple = [
+    submissionId: string,
+    lockedOrMintedAmount: bigint,
+    totalSupply: bigint
+  ];
+  export interface OutputObject {
+    submissionId: string;
+    lockedOrMintedAmount: bigint;
+    totalSupply: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type MonitoringClaimEventEvent = TypedEvent<
-  [string, BigNumber, BigNumber],
-  MonitoringClaimEventEventObject
->;
 
-export type MonitoringClaimEventEventFilter =
-  TypedEventFilter<MonitoringClaimEventEvent>;
-
-export interface MonitoringSendEventEventObject {
-  submissionId: string;
-  nonce: BigNumber;
-  lockedOrMintedAmount: BigNumber;
-  totalSupply: BigNumber;
+export namespace MonitoringSendEventEvent {
+  export type InputTuple = [
+    submissionId: BytesLike,
+    nonce: BigNumberish,
+    lockedOrMintedAmount: BigNumberish,
+    totalSupply: BigNumberish
+  ];
+  export type OutputTuple = [
+    submissionId: string,
+    nonce: bigint,
+    lockedOrMintedAmount: bigint,
+    totalSupply: bigint
+  ];
+  export interface OutputObject {
+    submissionId: string;
+    nonce: bigint;
+    lockedOrMintedAmount: bigint;
+    totalSupply: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type MonitoringSendEventEvent = TypedEvent<
-  [string, BigNumber, BigNumber, BigNumber],
-  MonitoringSendEventEventObject
->;
 
-export type MonitoringSendEventEventFilter =
-  TypedEventFilter<MonitoringSendEventEvent>;
-
-export interface PairAddedEventObject {
-  debridgeId: string;
-  tokenAddress: string;
-  nativeAddress: string;
-  nativeChainId: BigNumber;
-  maxAmount: BigNumber;
-  minReservesBps: number;
+export namespace PairAddedEvent {
+  export type InputTuple = [
+    debridgeId: BytesLike,
+    tokenAddress: AddressLike,
+    nativeAddress: BytesLike,
+    nativeChainId: BigNumberish,
+    maxAmount: BigNumberish,
+    minReservesBps: BigNumberish
+  ];
+  export type OutputTuple = [
+    debridgeId: string,
+    tokenAddress: string,
+    nativeAddress: string,
+    nativeChainId: bigint,
+    maxAmount: bigint,
+    minReservesBps: bigint
+  ];
+  export interface OutputObject {
+    debridgeId: string;
+    tokenAddress: string;
+    nativeAddress: string;
+    nativeChainId: bigint;
+    maxAmount: bigint;
+    minReservesBps: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type PairAddedEvent = TypedEvent<
-  [string, string, string, BigNumber, BigNumber, number],
-  PairAddedEventObject
->;
 
-export type PairAddedEventFilter = TypedEventFilter<PairAddedEvent>;
-
-export interface PausedEventObject {
-  account: string;
+export namespace PausedEvent {
+  export type InputTuple = [account: AddressLike];
+  export type OutputTuple = [account: string];
+  export interface OutputObject {
+    account: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type PausedEvent = TypedEvent<[string], PausedEventObject>;
 
-export type PausedEventFilter = TypedEventFilter<PausedEvent>;
-
-export interface RoleAdminChangedEventObject {
-  role: string;
-  previousAdminRole: string;
-  newAdminRole: string;
+export namespace RoleAdminChangedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    previousAdminRole: BytesLike,
+    newAdminRole: BytesLike
+  ];
+  export type OutputTuple = [
+    role: string,
+    previousAdminRole: string,
+    newAdminRole: string
+  ];
+  export interface OutputObject {
+    role: string;
+    previousAdminRole: string;
+    newAdminRole: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type RoleAdminChangedEvent = TypedEvent<
-  [string, string, string],
-  RoleAdminChangedEventObject
->;
 
-export type RoleAdminChangedEventFilter =
-  TypedEventFilter<RoleAdminChangedEvent>;
-
-export interface RoleGrantedEventObject {
-  role: string;
-  account: string;
-  sender: string;
+export namespace RoleGrantedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    account: AddressLike,
+    sender: AddressLike
+  ];
+  export type OutputTuple = [role: string, account: string, sender: string];
+  export interface OutputObject {
+    role: string;
+    account: string;
+    sender: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type RoleGrantedEvent = TypedEvent<
-  [string, string, string],
-  RoleGrantedEventObject
->;
 
-export type RoleGrantedEventFilter = TypedEventFilter<RoleGrantedEvent>;
-
-export interface RoleRevokedEventObject {
-  role: string;
-  account: string;
-  sender: string;
+export namespace RoleRevokedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    account: AddressLike,
+    sender: AddressLike
+  ];
+  export type OutputTuple = [role: string, account: string, sender: string];
+  export interface OutputObject {
+    role: string;
+    account: string;
+    sender: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type RoleRevokedEvent = TypedEvent<
-  [string, string, string],
-  RoleRevokedEventObject
->;
 
-export type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
-
-export interface SentEventObject {
-  submissionId: string;
-  debridgeId: string;
-  amount: BigNumber;
-  receiver: string;
-  nonce: BigNumber;
-  chainIdTo: BigNumber;
-  referralCode: number;
-  feeParams: IDeBridgeGate.FeeParamsStructOutput;
-  autoParams: string;
-  nativeSender: string;
+export namespace SentEvent {
+  export type InputTuple = [
+    submissionId: BytesLike,
+    debridgeId: BytesLike,
+    amount: BigNumberish,
+    receiver: BytesLike,
+    nonce: BigNumberish,
+    chainIdTo: BigNumberish,
+    referralCode: BigNumberish,
+    feeParams: IDeBridgeGate.FeeParamsStruct,
+    autoParams: BytesLike,
+    nativeSender: AddressLike
+  ];
+  export type OutputTuple = [
+    submissionId: string,
+    debridgeId: string,
+    amount: bigint,
+    receiver: string,
+    nonce: bigint,
+    chainIdTo: bigint,
+    referralCode: bigint,
+    feeParams: IDeBridgeGate.FeeParamsStructOutput,
+    autoParams: string,
+    nativeSender: string
+  ];
+  export interface OutputObject {
+    submissionId: string;
+    debridgeId: string;
+    amount: bigint;
+    receiver: string;
+    nonce: bigint;
+    chainIdTo: bigint;
+    referralCode: bigint;
+    feeParams: IDeBridgeGate.FeeParamsStructOutput;
+    autoParams: string;
+    nativeSender: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type SentEvent = TypedEvent<
-  [
-    string,
-    string,
-    BigNumber,
-    string,
-    BigNumber,
-    BigNumber,
-    number,
-    IDeBridgeGate.FeeParamsStructOutput,
-    string,
-    string
-  ],
-  SentEventObject
->;
 
-export type SentEventFilter = TypedEventFilter<SentEvent>;
-
-export interface UnblockedEventObject {
-  submissionId: string;
+export namespace UnblockedEvent {
+  export type InputTuple = [submissionId: BytesLike];
+  export type OutputTuple = [submissionId: string];
+  export interface OutputObject {
+    submissionId: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type UnblockedEvent = TypedEvent<[string], UnblockedEventObject>;
 
-export type UnblockedEventFilter = TypedEventFilter<UnblockedEvent>;
-
-export interface UnpausedEventObject {
-  account: string;
+export namespace UnpausedEvent {
+  export type InputTuple = [account: AddressLike];
+  export type OutputTuple = [account: string];
+  export interface OutputObject {
+    account: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type UnpausedEvent = TypedEvent<[string], UnpausedEventObject>;
 
-export type UnpausedEventFilter = TypedEventFilter<UnpausedEvent>;
-
-export interface WithdrawnFeeEventObject {
-  debridgeId: string;
-  fee: BigNumber;
+export namespace WithdrawnFeeEvent {
+  export type InputTuple = [debridgeId: BytesLike, fee: BigNumberish];
+  export type OutputTuple = [debridgeId: string, fee: bigint];
+  export interface OutputObject {
+    debridgeId: string;
+    fee: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type WithdrawnFeeEvent = TypedEvent<
-  [string, BigNumber],
-  WithdrawnFeeEventObject
->;
-
-export type WithdrawnFeeEventFilter = TypedEventFilter<WithdrawnFeeEvent>;
 
 export interface DeBridgeGate extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): DeBridgeGate;
+  waitForDeployment(): Promise<this>;
 
   interface: DeBridgeGateInterface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  functions: {
-    BPS_DENOMINATOR(overrides?: CallOverrides): Promise<[BigNumber]>;
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
 
-    DEPLOY_PREFIX(overrides?: CallOverrides): Promise<[BigNumber]>;
+  BPS_DENOMINATOR: TypedContractMethod<[], [bigint], "view">;
 
-    GOVMONITORING_ROLE(overrides?: CallOverrides): Promise<[string]>;
+  DEFAULT_ADMIN_ROLE: TypedContractMethod<[], [string], "view">;
 
-    SUBMISSION_PREFIX(overrides?: CallOverrides): Promise<[BigNumber]>;
+  DEPLOY_PREFIX: TypedContractMethod<[], [bigint], "view">;
 
-    autoUpdateFixedNativeFee(
-      _globalFixedNativeFee: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  GOVMONITORING_ROLE: TypedContractMethod<[], [string], "view">;
 
-    blockSubmission(
-      _submissionIds: PromiseOrValue<BytesLike>[],
-      isBlocked: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  SUBMISSION_PREFIX: TypedContractMethod<[], [bigint], "view">;
 
-    callProxy(overrides?: CallOverrides): Promise<[string]>;
+  autoUpdateFixedNativeFee: TypedContractMethod<
+    [_globalFixedNativeFee: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
-    claim(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      _receiver: PromiseOrValue<string>,
-      _nonce: PromiseOrValue<BigNumberish>,
-      _signatures: PromiseOrValue<BytesLike>,
-      _autoParams: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  blockSubmission: TypedContractMethod<
+    [_submissionIds: BytesLike[], isBlocked: boolean],
+    [void],
+    "nonpayable"
+  >;
 
-    deBridgeTokenDeployer(overrides?: CallOverrides): Promise<[string]>;
+  callProxy: TypedContractMethod<[], [string], "view">;
 
-    defiController(overrides?: CallOverrides): Promise<[string]>;
+  claim: TypedContractMethod<
+    [
+      _debridgeId: BytesLike,
+      _amount: BigNumberish,
+      _chainIdFrom: BigNumberish,
+      _receiver: AddressLike,
+      _nonce: BigNumberish,
+      _signatures: BytesLike,
+      _autoParams: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
 
-    deployNewAsset(
-      _nativeTokenAddress: PromiseOrValue<BytesLike>,
-      _nativeChainId: PromiseOrValue<BigNumberish>,
-      _name: PromiseOrValue<string>,
-      _symbol: PromiseOrValue<string>,
-      _decimals: PromiseOrValue<BigNumberish>,
-      _signatures: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  deBridgeTokenDeployer: TypedContractMethod<[], [string], "view">;
 
-    excessConfirmations(overrides?: CallOverrides): Promise<[number]>;
+  defiController: TypedContractMethod<[], [string], "view">;
 
-    feeContractUpdater(overrides?: CallOverrides): Promise<[string]>;
+  deployNewAsset: TypedContractMethod<
+    [
+      _nativeTokenAddress: BytesLike,
+      _nativeChainId: BigNumberish,
+      _name: string,
+      _symbol: string,
+      _decimals: BigNumberish,
+      _signatures: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
 
-    feeDiscount(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<
-      [number, number] & { discountFixBps: number; discountTransferBps: number }
-    >;
+  excessConfirmations: TypedContractMethod<[], [bigint], "view">;
 
-    feeProxy(overrides?: CallOverrides): Promise<[string]>;
+  feeContractUpdater: TypedContractMethod<[], [string], "view">;
 
-    flash(
-      _tokenAddress: PromiseOrValue<string>,
-      _receiver: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _data: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  feeDiscount: TypedContractMethod<
+    [arg0: AddressLike],
+    [
+      [bigint, bigint] & { discountFixBps: bigint; discountTransferBps: bigint }
+    ],
+    "view"
+  >;
 
-    flashFeeBps(overrides?: CallOverrides): Promise<[BigNumber]>;
+  feeProxy: TypedContractMethod<[], [string], "view">;
 
-    getAmountThreshold(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+  flash: TypedContractMethod<
+    [
+      _tokenAddress: AddressLike,
+      _receiver: AddressLike,
+      _amount: BigNumberish,
+      _data: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
 
-    getChainFromConfig(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, boolean, number] & {
-        fixedNativeFee: BigNumber;
+  flashFeeBps: TypedContractMethod<[], [bigint], "view">;
+
+  getAmountThreshold: TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
+
+  getChainFromConfig: TypedContractMethod<
+    [arg0: BigNumberish],
+    [
+      [bigint, boolean, bigint] & {
+        fixedNativeFee: bigint;
         isSupported: boolean;
-        transferFeeBps: number;
+        transferFeeBps: bigint;
       }
-    >;
+    ],
+    "view"
+  >;
 
-    getChainId(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { cid: BigNumber }>;
+  getChainId: TypedContractMethod<[], [bigint], "view">;
 
-    getChainToConfig(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, boolean, number] & {
-        fixedNativeFee: BigNumber;
+  getChainToConfig: TypedContractMethod<
+    [arg0: BigNumberish],
+    [
+      [bigint, boolean, bigint] & {
+        fixedNativeFee: bigint;
         isSupported: boolean;
-        transferFeeBps: number;
+        transferFeeBps: bigint;
       }
-    >;
+    ],
+    "view"
+  >;
 
-    getDebridge(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber, string, number, boolean] & {
-        chainId: BigNumber;
-        maxAmount: BigNumber;
-        balance: BigNumber;
-        lockedInStrategies: BigNumber;
+  getDebridge: TypedContractMethod<
+    [arg0: BytesLike],
+    [
+      [bigint, bigint, bigint, bigint, string, bigint, boolean] & {
+        chainId: bigint;
+        maxAmount: bigint;
+        balance: bigint;
+        lockedInStrategies: bigint;
         tokenAddress: string;
-        minReservesBps: number;
+        minReservesBps: bigint;
         exist: boolean;
       }
-    >;
+    ],
+    "view"
+  >;
 
-    getDebridgeChainAssetFixedFee(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _chainId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+  getDebridgeChainAssetFixedFee: TypedContractMethod<
+    [_debridgeId: BytesLike, _chainId: BigNumberish],
+    [bigint],
+    "view"
+  >;
 
-    getDebridgeFeeInfo(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber] & {
-        collectedFees: BigNumber;
-        withdrawnFees: BigNumber;
-      }
-    >;
+  getDebridgeFeeInfo: TypedContractMethod<
+    [arg0: BytesLike],
+    [[bigint, bigint] & { collectedFees: bigint; withdrawnFees: bigint }],
+    "view"
+  >;
 
-    getDebridgeId(
-      _chainId: PromiseOrValue<BigNumberish>,
-      _tokenAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
+  getDebridgeId: TypedContractMethod<
+    [_chainId: BigNumberish, _tokenAddress: AddressLike],
+    [string],
+    "view"
+  >;
 
-    getDefiAvaliableReserves(
-      _tokenAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+  getDefiAvaliableReserves: TypedContractMethod<
+    [_tokenAddress: AddressLike],
+    [bigint],
+    "view"
+  >;
 
-    getDeployId(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _name: PromiseOrValue<string>,
-      _symbol: PromiseOrValue<string>,
-      _decimals: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
+  getDeployId: TypedContractMethod<
+    [
+      _debridgeId: BytesLike,
+      _name: string,
+      _symbol: string,
+      _decimals: BigNumberish
+    ],
+    [string],
+    "view"
+  >;
 
-    getNativeInfo(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, string] & { nativeChainId: BigNumber; nativeAddress: string }
-    >;
+  getNativeInfo: TypedContractMethod<
+    [arg0: AddressLike],
+    [[bigint, string] & { nativeChainId: bigint; nativeAddress: string }],
+    "view"
+  >;
 
-    getRoleAdmin(
-      role: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
+  getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
 
-    getSubmissionIdFrom(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _receiver: PromiseOrValue<string>,
-      _nonce: PromiseOrValue<BigNumberish>,
+  getSubmissionIdFrom: TypedContractMethod<
+    [
+      _debridgeId: BytesLike,
+      _chainIdFrom: BigNumberish,
+      _amount: BigNumberish,
+      _receiver: AddressLike,
+      _nonce: BigNumberish,
       _autoParams: IDeBridgeGate.SubmissionAutoParamsFromStruct,
-      _hasAutoParams: PromiseOrValue<boolean>,
-      _sender: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
+      _hasAutoParams: boolean,
+      _sender: AddressLike
+    ],
+    [string],
+    "view"
+  >;
 
-    getbDebridgeId(
-      _chainId: PromiseOrValue<BigNumberish>,
-      _tokenAddress: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
+  getbDebridgeId: TypedContractMethod<
+    [_chainId: BigNumberish, _tokenAddress: BytesLike],
+    [string],
+    "view"
+  >;
 
-    globalFixedNativeFee(overrides?: CallOverrides): Promise<[BigNumber]>;
+  globalFixedNativeFee: TypedContractMethod<[], [bigint], "view">;
 
-    globalTransferFeeBps(overrides?: CallOverrides): Promise<[number]>;
+  globalTransferFeeBps: TypedContractMethod<[], [bigint], "view">;
 
-    grantRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  grantRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    hasRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
+  hasRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [boolean],
+    "view"
+  >;
 
-    initialize(
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      _weth: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  initialize: TypedContractMethod<
+    [_excessConfirmations: BigNumberish, _weth: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    isBlockedSubmission(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
+  isBlockedSubmission: TypedContractMethod<
+    [arg0: BytesLike],
+    [boolean],
+    "view"
+  >;
 
-    isSubmissionUsed(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
+  isSubmissionUsed: TypedContractMethod<[arg0: BytesLike], [boolean], "view">;
 
-    lockedClaim(overrides?: CallOverrides): Promise<[BigNumber]>;
+  lockedClaim: TypedContractMethod<[], [bigint], "view">;
 
-    nonce(overrides?: CallOverrides): Promise<[BigNumber]>;
+  nonce: TypedContractMethod<[], [bigint], "view">;
 
-    pause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  pause: TypedContractMethod<[], [void], "nonpayable">;
 
-    paused(overrides?: CallOverrides): Promise<[boolean]>;
+  paused: TypedContractMethod<[], [boolean], "view">;
 
-    renounceRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  renounceRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    requestReserves(
-      _tokenAddress: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  requestReserves: TypedContractMethod<
+    [_tokenAddress: AddressLike, _amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
-    returnReserves(
-      _tokenAddress: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  returnReserves: TypedContractMethod<
+    [_tokenAddress: AddressLike, _amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
-    revokeRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  revokeRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    send(
-      _tokenAddress: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _chainIdTo: PromiseOrValue<BigNumberish>,
-      _receiver: PromiseOrValue<BytesLike>,
-      _permit: PromiseOrValue<BytesLike>,
-      _useAssetFee: PromiseOrValue<boolean>,
-      _referralCode: PromiseOrValue<BigNumberish>,
-      _autoParams: PromiseOrValue<BytesLike>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  send: TypedContractMethod<
+    [
+      _tokenAddress: AddressLike,
+      _amount: BigNumberish,
+      _chainIdTo: BigNumberish,
+      _receiver: BytesLike,
+      _permit: BytesLike,
+      _useAssetFee: boolean,
+      _referralCode: BigNumberish,
+      _autoParams: BytesLike
+    ],
+    [void],
+    "payable"
+  >;
 
-    setCallProxy(
-      _callProxy: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  setCallProxy: TypedContractMethod<
+    [_callProxy: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    setChainSupport(
-      _chainId: PromiseOrValue<BigNumberish>,
-      _isSupported: PromiseOrValue<boolean>,
-      _isChainFrom: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  setChainSupport: TypedContractMethod<
+    [_chainId: BigNumberish, _isSupported: boolean, _isChainFrom: boolean],
+    [void],
+    "nonpayable"
+  >;
 
-    setDeBridgeTokenDeployer(
-      _deBridgeTokenDeployer: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  setDeBridgeTokenDeployer: TypedContractMethod<
+    [_deBridgeTokenDeployer: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    setDefiController(
-      _defiController: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  setDefiController: TypedContractMethod<
+    [_defiController: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    setFeeContractUpdater(
-      _value: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  setFeeContractUpdater: TypedContractMethod<
+    [_value: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    setFeeProxy(
-      _feeProxy: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  setFeeProxy: TypedContractMethod<
+    [_feeProxy: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    setSignatureVerifier(
-      _verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  setSignatureVerifier: TypedContractMethod<
+    [_verifier: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    setWethGate(
-      _wethGate: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  setWethGate: TypedContractMethod<
+    [_wethGate: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    signatureVerifier(overrides?: CallOverrides): Promise<[string]>;
+  signatureVerifier: TypedContractMethod<[], [string], "view">;
 
-    supportsInterface(
-      interfaceId: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
+  supportsInterface: TypedContractMethod<
+    [interfaceId: BytesLike],
+    [boolean],
+    "view"
+  >;
 
-    unpause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  unpause: TypedContractMethod<[], [void], "nonpayable">;
 
-    updateAsset(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _maxAmount: PromiseOrValue<BigNumberish>,
-      _minReservesBps: PromiseOrValue<BigNumberish>,
-      _amountThreshold: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  updateAsset: TypedContractMethod<
+    [
+      _debridgeId: BytesLike,
+      _maxAmount: BigNumberish,
+      _minReservesBps: BigNumberish,
+      _amountThreshold: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
 
-    updateAssetFixedFees(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _supportedChainIds: PromiseOrValue<BigNumberish>[],
-      _assetFeesInfo: PromiseOrValue<BigNumberish>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  updateAssetFixedFees: TypedContractMethod<
+    [
+      _debridgeId: BytesLike,
+      _supportedChainIds: BigNumberish[],
+      _assetFeesInfo: BigNumberish[]
+    ],
+    [void],
+    "nonpayable"
+  >;
 
-    updateChainSupport(
-      _chainIds: PromiseOrValue<BigNumberish>[],
+  updateChainSupport: TypedContractMethod<
+    [
+      _chainIds: BigNumberish[],
       _chainSupportInfo: IDeBridgeGate.ChainSupportInfoStruct[],
-      _isChainFrom: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    updateExcessConfirmations(
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    updateFeeDiscount(
-      _address: PromiseOrValue<string>,
-      _discountFixBps: PromiseOrValue<BigNumberish>,
-      _discountTransferBps: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    updateFlashFee(
-      _flashFeeBps: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    updateGlobalFee(
-      _globalFixedNativeFee: PromiseOrValue<BigNumberish>,
-      _globalTransferFeeBps: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    version(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    weth(overrides?: CallOverrides): Promise<[string]>;
-
-    wethGate(overrides?: CallOverrides): Promise<[string]>;
-
-    withdrawFee(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-  };
-
-  BPS_DENOMINATOR(overrides?: CallOverrides): Promise<BigNumber>;
-
-  DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-
-  DEPLOY_PREFIX(overrides?: CallOverrides): Promise<BigNumber>;
-
-  GOVMONITORING_ROLE(overrides?: CallOverrides): Promise<string>;
-
-  SUBMISSION_PREFIX(overrides?: CallOverrides): Promise<BigNumber>;
-
-  autoUpdateFixedNativeFee(
-    _globalFixedNativeFee: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  blockSubmission(
-    _submissionIds: PromiseOrValue<BytesLike>[],
-    isBlocked: PromiseOrValue<boolean>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  callProxy(overrides?: CallOverrides): Promise<string>;
-
-  claim(
-    _debridgeId: PromiseOrValue<BytesLike>,
-    _amount: PromiseOrValue<BigNumberish>,
-    _chainIdFrom: PromiseOrValue<BigNumberish>,
-    _receiver: PromiseOrValue<string>,
-    _nonce: PromiseOrValue<BigNumberish>,
-    _signatures: PromiseOrValue<BytesLike>,
-    _autoParams: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  deBridgeTokenDeployer(overrides?: CallOverrides): Promise<string>;
-
-  defiController(overrides?: CallOverrides): Promise<string>;
-
-  deployNewAsset(
-    _nativeTokenAddress: PromiseOrValue<BytesLike>,
-    _nativeChainId: PromiseOrValue<BigNumberish>,
-    _name: PromiseOrValue<string>,
-    _symbol: PromiseOrValue<string>,
-    _decimals: PromiseOrValue<BigNumberish>,
-    _signatures: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  excessConfirmations(overrides?: CallOverrides): Promise<number>;
-
-  feeContractUpdater(overrides?: CallOverrides): Promise<string>;
-
-  feeDiscount(
-    arg0: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<
-    [number, number] & { discountFixBps: number; discountTransferBps: number }
+      _isChainFrom: boolean
+    ],
+    [void],
+    "nonpayable"
   >;
 
-  feeProxy(overrides?: CallOverrides): Promise<string>;
-
-  flash(
-    _tokenAddress: PromiseOrValue<string>,
-    _receiver: PromiseOrValue<string>,
-    _amount: PromiseOrValue<BigNumberish>,
-    _data: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  flashFeeBps(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getAmountThreshold(
-    arg0: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  getChainFromConfig(
-    arg0: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, boolean, number] & {
-      fixedNativeFee: BigNumber;
-      isSupported: boolean;
-      transferFeeBps: number;
-    }
+  updateExcessConfirmations: TypedContractMethod<
+    [_excessConfirmations: BigNumberish],
+    [void],
+    "nonpayable"
   >;
 
-  getChainId(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getChainToConfig(
-    arg0: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, boolean, number] & {
-      fixedNativeFee: BigNumber;
-      isSupported: boolean;
-      transferFeeBps: number;
-    }
+  updateFeeDiscount: TypedContractMethod<
+    [
+      _address: AddressLike,
+      _discountFixBps: BigNumberish,
+      _discountTransferBps: BigNumberish
+    ],
+    [void],
+    "nonpayable"
   >;
 
-  getDebridge(
-    arg0: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber, string, number, boolean] & {
-      chainId: BigNumber;
-      maxAmount: BigNumber;
-      balance: BigNumber;
-      lockedInStrategies: BigNumber;
-      tokenAddress: string;
-      minReservesBps: number;
-      exist: boolean;
-    }
+  updateFlashFee: TypedContractMethod<
+    [_flashFeeBps: BigNumberish],
+    [void],
+    "nonpayable"
   >;
 
-  getDebridgeChainAssetFixedFee(
-    _debridgeId: PromiseOrValue<BytesLike>,
-    _chainId: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  getDebridgeFeeInfo(
-    arg0: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber] & {
-      collectedFees: BigNumber;
-      withdrawnFees: BigNumber;
-    }
+  updateGlobalFee: TypedContractMethod<
+    [_globalFixedNativeFee: BigNumberish, _globalTransferFeeBps: BigNumberish],
+    [void],
+    "nonpayable"
   >;
 
-  getDebridgeId(
-    _chainId: PromiseOrValue<BigNumberish>,
-    _tokenAddress: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<string>;
+  version: TypedContractMethod<[], [bigint], "view">;
 
-  getDefiAvaliableReserves(
-    _tokenAddress: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  weth: TypedContractMethod<[], [string], "view">;
 
-  getDeployId(
-    _debridgeId: PromiseOrValue<BytesLike>,
-    _name: PromiseOrValue<string>,
-    _symbol: PromiseOrValue<string>,
-    _decimals: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<string>;
+  wethGate: TypedContractMethod<[], [string], "view">;
 
-  getNativeInfo(
-    arg0: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, string] & { nativeChainId: BigNumber; nativeAddress: string }
+  withdrawFee: TypedContractMethod<
+    [_debridgeId: BytesLike],
+    [void],
+    "nonpayable"
   >;
 
-  getRoleAdmin(
-    role: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<string>;
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
 
-  getSubmissionIdFrom(
-    _debridgeId: PromiseOrValue<BytesLike>,
-    _chainIdFrom: PromiseOrValue<BigNumberish>,
-    _amount: PromiseOrValue<BigNumberish>,
-    _receiver: PromiseOrValue<string>,
-    _nonce: PromiseOrValue<BigNumberish>,
-    _autoParams: IDeBridgeGate.SubmissionAutoParamsFromStruct,
-    _hasAutoParams: PromiseOrValue<boolean>,
-    _sender: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  getbDebridgeId(
-    _chainId: PromiseOrValue<BigNumberish>,
-    _tokenAddress: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  globalFixedNativeFee(overrides?: CallOverrides): Promise<BigNumber>;
-
-  globalTransferFeeBps(overrides?: CallOverrides): Promise<number>;
-
-  grantRole(
-    role: PromiseOrValue<BytesLike>,
-    account: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  hasRole(
-    role: PromiseOrValue<BytesLike>,
-    account: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  initialize(
-    _excessConfirmations: PromiseOrValue<BigNumberish>,
-    _weth: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  isBlockedSubmission(
-    arg0: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  isSubmissionUsed(
-    arg0: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  lockedClaim(overrides?: CallOverrides): Promise<BigNumber>;
-
-  nonce(overrides?: CallOverrides): Promise<BigNumber>;
-
-  pause(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  paused(overrides?: CallOverrides): Promise<boolean>;
-
-  renounceRole(
-    role: PromiseOrValue<BytesLike>,
-    account: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  requestReserves(
-    _tokenAddress: PromiseOrValue<string>,
-    _amount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  returnReserves(
-    _tokenAddress: PromiseOrValue<string>,
-    _amount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  revokeRole(
-    role: PromiseOrValue<BytesLike>,
-    account: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  send(
-    _tokenAddress: PromiseOrValue<string>,
-    _amount: PromiseOrValue<BigNumberish>,
-    _chainIdTo: PromiseOrValue<BigNumberish>,
-    _receiver: PromiseOrValue<BytesLike>,
-    _permit: PromiseOrValue<BytesLike>,
-    _useAssetFee: PromiseOrValue<boolean>,
-    _referralCode: PromiseOrValue<BigNumberish>,
-    _autoParams: PromiseOrValue<BytesLike>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setCallProxy(
-    _callProxy: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setChainSupport(
-    _chainId: PromiseOrValue<BigNumberish>,
-    _isSupported: PromiseOrValue<boolean>,
-    _isChainFrom: PromiseOrValue<boolean>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setDeBridgeTokenDeployer(
-    _deBridgeTokenDeployer: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setDefiController(
-    _defiController: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setFeeContractUpdater(
-    _value: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setFeeProxy(
-    _feeProxy: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setSignatureVerifier(
-    _verifier: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setWethGate(
-    _wethGate: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  signatureVerifier(overrides?: CallOverrides): Promise<string>;
-
-  supportsInterface(
-    interfaceId: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  unpause(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  updateAsset(
-    _debridgeId: PromiseOrValue<BytesLike>,
-    _maxAmount: PromiseOrValue<BigNumberish>,
-    _minReservesBps: PromiseOrValue<BigNumberish>,
-    _amountThreshold: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  updateAssetFixedFees(
-    _debridgeId: PromiseOrValue<BytesLike>,
-    _supportedChainIds: PromiseOrValue<BigNumberish>[],
-    _assetFeesInfo: PromiseOrValue<BigNumberish>[],
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  updateChainSupport(
-    _chainIds: PromiseOrValue<BigNumberish>[],
-    _chainSupportInfo: IDeBridgeGate.ChainSupportInfoStruct[],
-    _isChainFrom: PromiseOrValue<boolean>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  updateExcessConfirmations(
-    _excessConfirmations: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  updateFeeDiscount(
-    _address: PromiseOrValue<string>,
-    _discountFixBps: PromiseOrValue<BigNumberish>,
-    _discountTransferBps: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  updateFlashFee(
-    _flashFeeBps: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  updateGlobalFee(
-    _globalFixedNativeFee: PromiseOrValue<BigNumberish>,
-    _globalTransferFeeBps: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  version(overrides?: CallOverrides): Promise<BigNumber>;
-
-  weth(overrides?: CallOverrides): Promise<string>;
-
-  wethGate(overrides?: CallOverrides): Promise<string>;
-
-  withdrawFee(
-    _debridgeId: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  callStatic: {
-    BPS_DENOMINATOR(overrides?: CallOverrides): Promise<BigNumber>;
-
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-
-    DEPLOY_PREFIX(overrides?: CallOverrides): Promise<BigNumber>;
-
-    GOVMONITORING_ROLE(overrides?: CallOverrides): Promise<string>;
-
-    SUBMISSION_PREFIX(overrides?: CallOverrides): Promise<BigNumber>;
-
-    autoUpdateFixedNativeFee(
-      _globalFixedNativeFee: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    blockSubmission(
-      _submissionIds: PromiseOrValue<BytesLike>[],
-      isBlocked: PromiseOrValue<boolean>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    callProxy(overrides?: CallOverrides): Promise<string>;
-
-    claim(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      _receiver: PromiseOrValue<string>,
-      _nonce: PromiseOrValue<BigNumberish>,
-      _signatures: PromiseOrValue<BytesLike>,
-      _autoParams: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    deBridgeTokenDeployer(overrides?: CallOverrides): Promise<string>;
-
-    defiController(overrides?: CallOverrides): Promise<string>;
-
-    deployNewAsset(
-      _nativeTokenAddress: PromiseOrValue<BytesLike>,
-      _nativeChainId: PromiseOrValue<BigNumberish>,
-      _name: PromiseOrValue<string>,
-      _symbol: PromiseOrValue<string>,
-      _decimals: PromiseOrValue<BigNumberish>,
-      _signatures: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    excessConfirmations(overrides?: CallOverrides): Promise<number>;
-
-    feeContractUpdater(overrides?: CallOverrides): Promise<string>;
-
-    feeDiscount(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<
-      [number, number] & { discountFixBps: number; discountTransferBps: number }
-    >;
-
-    feeProxy(overrides?: CallOverrides): Promise<string>;
-
-    flash(
-      _tokenAddress: PromiseOrValue<string>,
-      _receiver: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _data: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    flashFeeBps(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getAmountThreshold(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getChainFromConfig(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, boolean, number] & {
-        fixedNativeFee: BigNumber;
+  getFunction(
+    nameOrSignature: "BPS_DENOMINATOR"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "DEFAULT_ADMIN_ROLE"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "DEPLOY_PREFIX"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "GOVMONITORING_ROLE"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "SUBMISSION_PREFIX"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "autoUpdateFixedNativeFee"
+  ): TypedContractMethod<
+    [_globalFixedNativeFee: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "blockSubmission"
+  ): TypedContractMethod<
+    [_submissionIds: BytesLike[], isBlocked: boolean],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "callProxy"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "claim"
+  ): TypedContractMethod<
+    [
+      _debridgeId: BytesLike,
+      _amount: BigNumberish,
+      _chainIdFrom: BigNumberish,
+      _receiver: AddressLike,
+      _nonce: BigNumberish,
+      _signatures: BytesLike,
+      _autoParams: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "deBridgeTokenDeployer"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "defiController"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "deployNewAsset"
+  ): TypedContractMethod<
+    [
+      _nativeTokenAddress: BytesLike,
+      _nativeChainId: BigNumberish,
+      _name: string,
+      _symbol: string,
+      _decimals: BigNumberish,
+      _signatures: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "excessConfirmations"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "feeContractUpdater"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "feeDiscount"
+  ): TypedContractMethod<
+    [arg0: AddressLike],
+    [
+      [bigint, bigint] & { discountFixBps: bigint; discountTransferBps: bigint }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "feeProxy"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "flash"
+  ): TypedContractMethod<
+    [
+      _tokenAddress: AddressLike,
+      _receiver: AddressLike,
+      _amount: BigNumberish,
+      _data: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "flashFeeBps"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getAmountThreshold"
+  ): TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getChainFromConfig"
+  ): TypedContractMethod<
+    [arg0: BigNumberish],
+    [
+      [bigint, boolean, bigint] & {
+        fixedNativeFee: bigint;
         isSupported: boolean;
-        transferFeeBps: number;
+        transferFeeBps: bigint;
       }
-    >;
-
-    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getChainToConfig(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, boolean, number] & {
-        fixedNativeFee: BigNumber;
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getChainId"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getChainToConfig"
+  ): TypedContractMethod<
+    [arg0: BigNumberish],
+    [
+      [bigint, boolean, bigint] & {
+        fixedNativeFee: bigint;
         isSupported: boolean;
-        transferFeeBps: number;
+        transferFeeBps: bigint;
       }
-    >;
-
-    getDebridge(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber, string, number, boolean] & {
-        chainId: BigNumber;
-        maxAmount: BigNumber;
-        balance: BigNumber;
-        lockedInStrategies: BigNumber;
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getDebridge"
+  ): TypedContractMethod<
+    [arg0: BytesLike],
+    [
+      [bigint, bigint, bigint, bigint, string, bigint, boolean] & {
+        chainId: bigint;
+        maxAmount: bigint;
+        balance: bigint;
+        lockedInStrategies: bigint;
         tokenAddress: string;
-        minReservesBps: number;
+        minReservesBps: bigint;
         exist: boolean;
       }
-    >;
-
-    getDebridgeChainAssetFixedFee(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _chainId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getDebridgeFeeInfo(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber] & {
-        collectedFees: BigNumber;
-        withdrawnFees: BigNumber;
-      }
-    >;
-
-    getDebridgeId(
-      _chainId: PromiseOrValue<BigNumberish>,
-      _tokenAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    getDefiAvaliableReserves(
-      _tokenAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getDeployId(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _name: PromiseOrValue<string>,
-      _symbol: PromiseOrValue<string>,
-      _decimals: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    getNativeInfo(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, string] & { nativeChainId: BigNumber; nativeAddress: string }
-    >;
-
-    getRoleAdmin(
-      role: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    getSubmissionIdFrom(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _receiver: PromiseOrValue<string>,
-      _nonce: PromiseOrValue<BigNumberish>,
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getDebridgeChainAssetFixedFee"
+  ): TypedContractMethod<
+    [_debridgeId: BytesLike, _chainId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getDebridgeFeeInfo"
+  ): TypedContractMethod<
+    [arg0: BytesLike],
+    [[bigint, bigint] & { collectedFees: bigint; withdrawnFees: bigint }],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getDebridgeId"
+  ): TypedContractMethod<
+    [_chainId: BigNumberish, _tokenAddress: AddressLike],
+    [string],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getDefiAvaliableReserves"
+  ): TypedContractMethod<[_tokenAddress: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getDeployId"
+  ): TypedContractMethod<
+    [
+      _debridgeId: BytesLike,
+      _name: string,
+      _symbol: string,
+      _decimals: BigNumberish
+    ],
+    [string],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getNativeInfo"
+  ): TypedContractMethod<
+    [arg0: AddressLike],
+    [[bigint, string] & { nativeChainId: bigint; nativeAddress: string }],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getRoleAdmin"
+  ): TypedContractMethod<[role: BytesLike], [string], "view">;
+  getFunction(
+    nameOrSignature: "getSubmissionIdFrom"
+  ): TypedContractMethod<
+    [
+      _debridgeId: BytesLike,
+      _chainIdFrom: BigNumberish,
+      _amount: BigNumberish,
+      _receiver: AddressLike,
+      _nonce: BigNumberish,
       _autoParams: IDeBridgeGate.SubmissionAutoParamsFromStruct,
-      _hasAutoParams: PromiseOrValue<boolean>,
-      _sender: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    getbDebridgeId(
-      _chainId: PromiseOrValue<BigNumberish>,
-      _tokenAddress: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    globalFixedNativeFee(overrides?: CallOverrides): Promise<BigNumber>;
-
-    globalTransferFeeBps(overrides?: CallOverrides): Promise<number>;
-
-    grantRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    hasRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    initialize(
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      _weth: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    isBlockedSubmission(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    isSubmissionUsed(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    lockedClaim(overrides?: CallOverrides): Promise<BigNumber>;
-
-    nonce(overrides?: CallOverrides): Promise<BigNumber>;
-
-    pause(overrides?: CallOverrides): Promise<void>;
-
-    paused(overrides?: CallOverrides): Promise<boolean>;
-
-    renounceRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    requestReserves(
-      _tokenAddress: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    returnReserves(
-      _tokenAddress: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    revokeRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    send(
-      _tokenAddress: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _chainIdTo: PromiseOrValue<BigNumberish>,
-      _receiver: PromiseOrValue<BytesLike>,
-      _permit: PromiseOrValue<BytesLike>,
-      _useAssetFee: PromiseOrValue<boolean>,
-      _referralCode: PromiseOrValue<BigNumberish>,
-      _autoParams: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setCallProxy(
-      _callProxy: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setChainSupport(
-      _chainId: PromiseOrValue<BigNumberish>,
-      _isSupported: PromiseOrValue<boolean>,
-      _isChainFrom: PromiseOrValue<boolean>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setDeBridgeTokenDeployer(
-      _deBridgeTokenDeployer: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setDefiController(
-      _defiController: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setFeeContractUpdater(
-      _value: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setFeeProxy(
-      _feeProxy: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setSignatureVerifier(
-      _verifier: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setWethGate(
-      _wethGate: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    signatureVerifier(overrides?: CallOverrides): Promise<string>;
-
-    supportsInterface(
-      interfaceId: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    unpause(overrides?: CallOverrides): Promise<void>;
-
-    updateAsset(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _maxAmount: PromiseOrValue<BigNumberish>,
-      _minReservesBps: PromiseOrValue<BigNumberish>,
-      _amountThreshold: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    updateAssetFixedFees(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _supportedChainIds: PromiseOrValue<BigNumberish>[],
-      _assetFeesInfo: PromiseOrValue<BigNumberish>[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    updateChainSupport(
-      _chainIds: PromiseOrValue<BigNumberish>[],
+      _hasAutoParams: boolean,
+      _sender: AddressLike
+    ],
+    [string],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getbDebridgeId"
+  ): TypedContractMethod<
+    [_chainId: BigNumberish, _tokenAddress: BytesLike],
+    [string],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "globalFixedNativeFee"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "globalTransferFeeBps"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "grantRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "hasRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [boolean],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "initialize"
+  ): TypedContractMethod<
+    [_excessConfirmations: BigNumberish, _weth: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "isBlockedSubmission"
+  ): TypedContractMethod<[arg0: BytesLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "isSubmissionUsed"
+  ): TypedContractMethod<[arg0: BytesLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "lockedClaim"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "nonce"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "pause"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "paused"
+  ): TypedContractMethod<[], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "renounceRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "requestReserves"
+  ): TypedContractMethod<
+    [_tokenAddress: AddressLike, _amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "returnReserves"
+  ): TypedContractMethod<
+    [_tokenAddress: AddressLike, _amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "revokeRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "send"
+  ): TypedContractMethod<
+    [
+      _tokenAddress: AddressLike,
+      _amount: BigNumberish,
+      _chainIdTo: BigNumberish,
+      _receiver: BytesLike,
+      _permit: BytesLike,
+      _useAssetFee: boolean,
+      _referralCode: BigNumberish,
+      _autoParams: BytesLike
+    ],
+    [void],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "setCallProxy"
+  ): TypedContractMethod<[_callProxy: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setChainSupport"
+  ): TypedContractMethod<
+    [_chainId: BigNumberish, _isSupported: boolean, _isChainFrom: boolean],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "setDeBridgeTokenDeployer"
+  ): TypedContractMethod<
+    [_deBridgeTokenDeployer: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "setDefiController"
+  ): TypedContractMethod<[_defiController: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setFeeContractUpdater"
+  ): TypedContractMethod<[_value: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setFeeProxy"
+  ): TypedContractMethod<[_feeProxy: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setSignatureVerifier"
+  ): TypedContractMethod<[_verifier: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setWethGate"
+  ): TypedContractMethod<[_wethGate: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "signatureVerifier"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "supportsInterface"
+  ): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "unpause"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "updateAsset"
+  ): TypedContractMethod<
+    [
+      _debridgeId: BytesLike,
+      _maxAmount: BigNumberish,
+      _minReservesBps: BigNumberish,
+      _amountThreshold: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "updateAssetFixedFees"
+  ): TypedContractMethod<
+    [
+      _debridgeId: BytesLike,
+      _supportedChainIds: BigNumberish[],
+      _assetFeesInfo: BigNumberish[]
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "updateChainSupport"
+  ): TypedContractMethod<
+    [
+      _chainIds: BigNumberish[],
       _chainSupportInfo: IDeBridgeGate.ChainSupportInfoStruct[],
-      _isChainFrom: PromiseOrValue<boolean>,
-      overrides?: CallOverrides
-    ): Promise<void>;
+      _isChainFrom: boolean
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "updateExcessConfirmations"
+  ): TypedContractMethod<
+    [_excessConfirmations: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "updateFeeDiscount"
+  ): TypedContractMethod<
+    [
+      _address: AddressLike,
+      _discountFixBps: BigNumberish,
+      _discountTransferBps: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "updateFlashFee"
+  ): TypedContractMethod<[_flashFeeBps: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "updateGlobalFee"
+  ): TypedContractMethod<
+    [_globalFixedNativeFee: BigNumberish, _globalTransferFeeBps: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "version"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "weth"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "wethGate"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "withdrawFee"
+  ): TypedContractMethod<[_debridgeId: BytesLike], [void], "nonpayable">;
 
-    updateExcessConfirmations(
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    updateFeeDiscount(
-      _address: PromiseOrValue<string>,
-      _discountFixBps: PromiseOrValue<BigNumberish>,
-      _discountTransferBps: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    updateFlashFee(
-      _flashFeeBps: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    updateGlobalFee(
-      _globalFixedNativeFee: PromiseOrValue<BigNumberish>,
-      _globalTransferFeeBps: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    version(overrides?: CallOverrides): Promise<BigNumber>;
-
-    weth(overrides?: CallOverrides): Promise<string>;
-
-    wethGate(overrides?: CallOverrides): Promise<string>;
-
-    withdrawFee(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-  };
+  getEvent(
+    key: "AutoRequestExecuted"
+  ): TypedContractEvent<
+    AutoRequestExecutedEvent.InputTuple,
+    AutoRequestExecutedEvent.OutputTuple,
+    AutoRequestExecutedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Blocked"
+  ): TypedContractEvent<
+    BlockedEvent.InputTuple,
+    BlockedEvent.OutputTuple,
+    BlockedEvent.OutputObject
+  >;
+  getEvent(
+    key: "CallProxyUpdated"
+  ): TypedContractEvent<
+    CallProxyUpdatedEvent.InputTuple,
+    CallProxyUpdatedEvent.OutputTuple,
+    CallProxyUpdatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "ChainSupportUpdated"
+  ): TypedContractEvent<
+    ChainSupportUpdatedEvent.InputTuple,
+    ChainSupportUpdatedEvent.OutputTuple,
+    ChainSupportUpdatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "ChainsSupportUpdated"
+  ): TypedContractEvent<
+    ChainsSupportUpdatedEvent.InputTuple,
+    ChainsSupportUpdatedEvent.OutputTuple,
+    ChainsSupportUpdatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Claimed"
+  ): TypedContractEvent<
+    ClaimedEvent.InputTuple,
+    ClaimedEvent.OutputTuple,
+    ClaimedEvent.OutputObject
+  >;
+  getEvent(
+    key: "FixedNativeFeeAutoUpdated"
+  ): TypedContractEvent<
+    FixedNativeFeeAutoUpdatedEvent.InputTuple,
+    FixedNativeFeeAutoUpdatedEvent.OutputTuple,
+    FixedNativeFeeAutoUpdatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "FixedNativeFeeUpdated"
+  ): TypedContractEvent<
+    FixedNativeFeeUpdatedEvent.InputTuple,
+    FixedNativeFeeUpdatedEvent.OutputTuple,
+    FixedNativeFeeUpdatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Flash"
+  ): TypedContractEvent<
+    FlashEvent.InputTuple,
+    FlashEvent.OutputTuple,
+    FlashEvent.OutputObject
+  >;
+  getEvent(
+    key: "Initialized"
+  ): TypedContractEvent<
+    InitializedEvent.InputTuple,
+    InitializedEvent.OutputTuple,
+    InitializedEvent.OutputObject
+  >;
+  getEvent(
+    key: "MonitoringClaimEvent"
+  ): TypedContractEvent<
+    MonitoringClaimEventEvent.InputTuple,
+    MonitoringClaimEventEvent.OutputTuple,
+    MonitoringClaimEventEvent.OutputObject
+  >;
+  getEvent(
+    key: "MonitoringSendEvent"
+  ): TypedContractEvent<
+    MonitoringSendEventEvent.InputTuple,
+    MonitoringSendEventEvent.OutputTuple,
+    MonitoringSendEventEvent.OutputObject
+  >;
+  getEvent(
+    key: "PairAdded"
+  ): TypedContractEvent<
+    PairAddedEvent.InputTuple,
+    PairAddedEvent.OutputTuple,
+    PairAddedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Paused"
+  ): TypedContractEvent<
+    PausedEvent.InputTuple,
+    PausedEvent.OutputTuple,
+    PausedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleAdminChanged"
+  ): TypedContractEvent<
+    RoleAdminChangedEvent.InputTuple,
+    RoleAdminChangedEvent.OutputTuple,
+    RoleAdminChangedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleGranted"
+  ): TypedContractEvent<
+    RoleGrantedEvent.InputTuple,
+    RoleGrantedEvent.OutputTuple,
+    RoleGrantedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleRevoked"
+  ): TypedContractEvent<
+    RoleRevokedEvent.InputTuple,
+    RoleRevokedEvent.OutputTuple,
+    RoleRevokedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Sent"
+  ): TypedContractEvent<
+    SentEvent.InputTuple,
+    SentEvent.OutputTuple,
+    SentEvent.OutputObject
+  >;
+  getEvent(
+    key: "Unblocked"
+  ): TypedContractEvent<
+    UnblockedEvent.InputTuple,
+    UnblockedEvent.OutputTuple,
+    UnblockedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Unpaused"
+  ): TypedContractEvent<
+    UnpausedEvent.InputTuple,
+    UnpausedEvent.OutputTuple,
+    UnpausedEvent.OutputObject
+  >;
+  getEvent(
+    key: "WithdrawnFee"
+  ): TypedContractEvent<
+    WithdrawnFeeEvent.InputTuple,
+    WithdrawnFeeEvent.OutputTuple,
+    WithdrawnFeeEvent.OutputObject
+  >;
 
   filters: {
-    "AutoRequestExecuted(bytes32,bool,address)"(
-      submissionId?: null,
-      success?: PromiseOrValue<boolean> | null,
-      callProxy?: null
-    ): AutoRequestExecutedEventFilter;
-    AutoRequestExecuted(
-      submissionId?: null,
-      success?: PromiseOrValue<boolean> | null,
-      callProxy?: null
-    ): AutoRequestExecutedEventFilter;
-
-    "Blocked(bytes32)"(submissionId?: null): BlockedEventFilter;
-    Blocked(submissionId?: null): BlockedEventFilter;
-
-    "CallProxyUpdated(address)"(callProxy?: null): CallProxyUpdatedEventFilter;
-    CallProxyUpdated(callProxy?: null): CallProxyUpdatedEventFilter;
-
-    "ChainSupportUpdated(uint256,bool,bool)"(
-      chainId?: null,
-      isSupported?: null,
-      isChainFrom?: null
-    ): ChainSupportUpdatedEventFilter;
-    ChainSupportUpdated(
-      chainId?: null,
-      isSupported?: null,
-      isChainFrom?: null
-    ): ChainSupportUpdatedEventFilter;
-
-    "ChainsSupportUpdated(uint256,tuple,bool)"(
-      chainIds?: null,
-      chainSupportInfo?: null,
-      isChainFrom?: null
-    ): ChainsSupportUpdatedEventFilter;
-    ChainsSupportUpdated(
-      chainIds?: null,
-      chainSupportInfo?: null,
-      isChainFrom?: null
-    ): ChainsSupportUpdatedEventFilter;
-
-    "Claimed(bytes32,bytes32,uint256,address,uint256,uint256,bytes,bool)"(
-      submissionId?: null,
-      debridgeId?: PromiseOrValue<BytesLike> | null,
-      amount?: null,
-      receiver?: PromiseOrValue<string> | null,
-      nonce?: null,
-      chainIdFrom?: PromiseOrValue<BigNumberish> | null,
-      autoParams?: null,
-      isNativeToken?: null
-    ): ClaimedEventFilter;
-    Claimed(
-      submissionId?: null,
-      debridgeId?: PromiseOrValue<BytesLike> | null,
-      amount?: null,
-      receiver?: PromiseOrValue<string> | null,
-      nonce?: null,
-      chainIdFrom?: PromiseOrValue<BigNumberish> | null,
-      autoParams?: null,
-      isNativeToken?: null
-    ): ClaimedEventFilter;
-
-    "FixedNativeFeeAutoUpdated(uint256)"(
-      globalFixedNativeFee?: null
-    ): FixedNativeFeeAutoUpdatedEventFilter;
-    FixedNativeFeeAutoUpdated(
-      globalFixedNativeFee?: null
-    ): FixedNativeFeeAutoUpdatedEventFilter;
-
-    "FixedNativeFeeUpdated(uint256,uint256)"(
-      globalFixedNativeFee?: null,
-      globalTransferFeeBps?: null
-    ): FixedNativeFeeUpdatedEventFilter;
-    FixedNativeFeeUpdated(
-      globalFixedNativeFee?: null,
-      globalTransferFeeBps?: null
-    ): FixedNativeFeeUpdatedEventFilter;
-
-    "Flash(address,address,address,uint256,uint256)"(
-      sender?: null,
-      tokenAddress?: PromiseOrValue<string> | null,
-      receiver?: PromiseOrValue<string> | null,
-      amount?: null,
-      paid?: null
-    ): FlashEventFilter;
-    Flash(
-      sender?: null,
-      tokenAddress?: PromiseOrValue<string> | null,
-      receiver?: PromiseOrValue<string> | null,
-      amount?: null,
-      paid?: null
-    ): FlashEventFilter;
-
-    "Initialized(uint8)"(version?: null): InitializedEventFilter;
-    Initialized(version?: null): InitializedEventFilter;
-
-    "MonitoringClaimEvent(bytes32,uint256,uint256)"(
-      submissionId?: null,
-      lockedOrMintedAmount?: null,
-      totalSupply?: null
-    ): MonitoringClaimEventEventFilter;
-    MonitoringClaimEvent(
-      submissionId?: null,
-      lockedOrMintedAmount?: null,
-      totalSupply?: null
-    ): MonitoringClaimEventEventFilter;
-
-    "MonitoringSendEvent(bytes32,uint256,uint256,uint256)"(
-      submissionId?: null,
-      nonce?: null,
-      lockedOrMintedAmount?: null,
-      totalSupply?: null
-    ): MonitoringSendEventEventFilter;
-    MonitoringSendEvent(
-      submissionId?: null,
-      nonce?: null,
-      lockedOrMintedAmount?: null,
-      totalSupply?: null
-    ): MonitoringSendEventEventFilter;
-
-    "PairAdded(bytes32,address,bytes,uint256,uint256,uint16)"(
-      debridgeId?: null,
-      tokenAddress?: null,
-      nativeAddress?: null,
-      nativeChainId?: PromiseOrValue<BigNumberish> | null,
-      maxAmount?: null,
-      minReservesBps?: null
-    ): PairAddedEventFilter;
-    PairAdded(
-      debridgeId?: null,
-      tokenAddress?: null,
-      nativeAddress?: null,
-      nativeChainId?: PromiseOrValue<BigNumberish> | null,
-      maxAmount?: null,
-      minReservesBps?: null
-    ): PairAddedEventFilter;
-
-    "Paused(address)"(account?: null): PausedEventFilter;
-    Paused(account?: null): PausedEventFilter;
-
-    "RoleAdminChanged(bytes32,bytes32,bytes32)"(
-      role?: PromiseOrValue<BytesLike> | null,
-      previousAdminRole?: PromiseOrValue<BytesLike> | null,
-      newAdminRole?: PromiseOrValue<BytesLike> | null
-    ): RoleAdminChangedEventFilter;
-    RoleAdminChanged(
-      role?: PromiseOrValue<BytesLike> | null,
-      previousAdminRole?: PromiseOrValue<BytesLike> | null,
-      newAdminRole?: PromiseOrValue<BytesLike> | null
-    ): RoleAdminChangedEventFilter;
-
-    "RoleGranted(bytes32,address,address)"(
-      role?: PromiseOrValue<BytesLike> | null,
-      account?: PromiseOrValue<string> | null,
-      sender?: PromiseOrValue<string> | null
-    ): RoleGrantedEventFilter;
-    RoleGranted(
-      role?: PromiseOrValue<BytesLike> | null,
-      account?: PromiseOrValue<string> | null,
-      sender?: PromiseOrValue<string> | null
-    ): RoleGrantedEventFilter;
-
-    "RoleRevoked(bytes32,address,address)"(
-      role?: PromiseOrValue<BytesLike> | null,
-      account?: PromiseOrValue<string> | null,
-      sender?: PromiseOrValue<string> | null
-    ): RoleRevokedEventFilter;
-    RoleRevoked(
-      role?: PromiseOrValue<BytesLike> | null,
-      account?: PromiseOrValue<string> | null,
-      sender?: PromiseOrValue<string> | null
-    ): RoleRevokedEventFilter;
-
-    "Sent(bytes32,bytes32,uint256,bytes,uint256,uint256,uint32,tuple,bytes,address)"(
-      submissionId?: null,
-      debridgeId?: PromiseOrValue<BytesLike> | null,
-      amount?: null,
-      receiver?: null,
-      nonce?: null,
-      chainIdTo?: PromiseOrValue<BigNumberish> | null,
-      referralCode?: null,
-      feeParams?: null,
-      autoParams?: null,
-      nativeSender?: null
-    ): SentEventFilter;
-    Sent(
-      submissionId?: null,
-      debridgeId?: PromiseOrValue<BytesLike> | null,
-      amount?: null,
-      receiver?: null,
-      nonce?: null,
-      chainIdTo?: PromiseOrValue<BigNumberish> | null,
-      referralCode?: null,
-      feeParams?: null,
-      autoParams?: null,
-      nativeSender?: null
-    ): SentEventFilter;
-
-    "Unblocked(bytes32)"(submissionId?: null): UnblockedEventFilter;
-    Unblocked(submissionId?: null): UnblockedEventFilter;
-
-    "Unpaused(address)"(account?: null): UnpausedEventFilter;
-    Unpaused(account?: null): UnpausedEventFilter;
-
-    "WithdrawnFee(bytes32,uint256)"(
-      debridgeId?: null,
-      fee?: null
-    ): WithdrawnFeeEventFilter;
-    WithdrawnFee(debridgeId?: null, fee?: null): WithdrawnFeeEventFilter;
-  };
-
-  estimateGas: {
-    BPS_DENOMINATOR(overrides?: CallOverrides): Promise<BigNumber>;
-
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    DEPLOY_PREFIX(overrides?: CallOverrides): Promise<BigNumber>;
-
-    GOVMONITORING_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    SUBMISSION_PREFIX(overrides?: CallOverrides): Promise<BigNumber>;
-
-    autoUpdateFixedNativeFee(
-      _globalFixedNativeFee: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    blockSubmission(
-      _submissionIds: PromiseOrValue<BytesLike>[],
-      isBlocked: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    callProxy(overrides?: CallOverrides): Promise<BigNumber>;
-
-    claim(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      _receiver: PromiseOrValue<string>,
-      _nonce: PromiseOrValue<BigNumberish>,
-      _signatures: PromiseOrValue<BytesLike>,
-      _autoParams: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    deBridgeTokenDeployer(overrides?: CallOverrides): Promise<BigNumber>;
-
-    defiController(overrides?: CallOverrides): Promise<BigNumber>;
-
-    deployNewAsset(
-      _nativeTokenAddress: PromiseOrValue<BytesLike>,
-      _nativeChainId: PromiseOrValue<BigNumberish>,
-      _name: PromiseOrValue<string>,
-      _symbol: PromiseOrValue<string>,
-      _decimals: PromiseOrValue<BigNumberish>,
-      _signatures: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    excessConfirmations(overrides?: CallOverrides): Promise<BigNumber>;
-
-    feeContractUpdater(overrides?: CallOverrides): Promise<BigNumber>;
-
-    feeDiscount(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    feeProxy(overrides?: CallOverrides): Promise<BigNumber>;
-
-    flash(
-      _tokenAddress: PromiseOrValue<string>,
-      _receiver: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _data: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    flashFeeBps(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getAmountThreshold(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getChainFromConfig(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getChainToConfig(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getDebridge(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getDebridgeChainAssetFixedFee(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _chainId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getDebridgeFeeInfo(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getDebridgeId(
-      _chainId: PromiseOrValue<BigNumberish>,
-      _tokenAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getDefiAvaliableReserves(
-      _tokenAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getDeployId(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _name: PromiseOrValue<string>,
-      _symbol: PromiseOrValue<string>,
-      _decimals: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getNativeInfo(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getRoleAdmin(
-      role: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getSubmissionIdFrom(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _receiver: PromiseOrValue<string>,
-      _nonce: PromiseOrValue<BigNumberish>,
-      _autoParams: IDeBridgeGate.SubmissionAutoParamsFromStruct,
-      _hasAutoParams: PromiseOrValue<boolean>,
-      _sender: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getbDebridgeId(
-      _chainId: PromiseOrValue<BigNumberish>,
-      _tokenAddress: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    globalFixedNativeFee(overrides?: CallOverrides): Promise<BigNumber>;
-
-    globalTransferFeeBps(overrides?: CallOverrides): Promise<BigNumber>;
-
-    grantRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    hasRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    initialize(
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      _weth: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    isBlockedSubmission(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    isSubmissionUsed(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    lockedClaim(overrides?: CallOverrides): Promise<BigNumber>;
-
-    nonce(overrides?: CallOverrides): Promise<BigNumber>;
-
-    pause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    paused(overrides?: CallOverrides): Promise<BigNumber>;
-
-    renounceRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    requestReserves(
-      _tokenAddress: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    returnReserves(
-      _tokenAddress: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    revokeRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    send(
-      _tokenAddress: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _chainIdTo: PromiseOrValue<BigNumberish>,
-      _receiver: PromiseOrValue<BytesLike>,
-      _permit: PromiseOrValue<BytesLike>,
-      _useAssetFee: PromiseOrValue<boolean>,
-      _referralCode: PromiseOrValue<BigNumberish>,
-      _autoParams: PromiseOrValue<BytesLike>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setCallProxy(
-      _callProxy: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setChainSupport(
-      _chainId: PromiseOrValue<BigNumberish>,
-      _isSupported: PromiseOrValue<boolean>,
-      _isChainFrom: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setDeBridgeTokenDeployer(
-      _deBridgeTokenDeployer: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setDefiController(
-      _defiController: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setFeeContractUpdater(
-      _value: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setFeeProxy(
-      _feeProxy: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setSignatureVerifier(
-      _verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setWethGate(
-      _wethGate: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    signatureVerifier(overrides?: CallOverrides): Promise<BigNumber>;
-
-    supportsInterface(
-      interfaceId: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    unpause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    updateAsset(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _maxAmount: PromiseOrValue<BigNumberish>,
-      _minReservesBps: PromiseOrValue<BigNumberish>,
-      _amountThreshold: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    updateAssetFixedFees(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _supportedChainIds: PromiseOrValue<BigNumberish>[],
-      _assetFeesInfo: PromiseOrValue<BigNumberish>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    updateChainSupport(
-      _chainIds: PromiseOrValue<BigNumberish>[],
-      _chainSupportInfo: IDeBridgeGate.ChainSupportInfoStruct[],
-      _isChainFrom: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    updateExcessConfirmations(
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    updateFeeDiscount(
-      _address: PromiseOrValue<string>,
-      _discountFixBps: PromiseOrValue<BigNumberish>,
-      _discountTransferBps: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    updateFlashFee(
-      _flashFeeBps: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    updateGlobalFee(
-      _globalFixedNativeFee: PromiseOrValue<BigNumberish>,
-      _globalTransferFeeBps: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    version(overrides?: CallOverrides): Promise<BigNumber>;
-
-    weth(overrides?: CallOverrides): Promise<BigNumber>;
-
-    wethGate(overrides?: CallOverrides): Promise<BigNumber>;
-
-    withdrawFee(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    BPS_DENOMINATOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    DEFAULT_ADMIN_ROLE(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    DEPLOY_PREFIX(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    GOVMONITORING_ROLE(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    SUBMISSION_PREFIX(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    autoUpdateFixedNativeFee(
-      _globalFixedNativeFee: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    blockSubmission(
-      _submissionIds: PromiseOrValue<BytesLike>[],
-      isBlocked: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    callProxy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    claim(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      _receiver: PromiseOrValue<string>,
-      _nonce: PromiseOrValue<BigNumberish>,
-      _signatures: PromiseOrValue<BytesLike>,
-      _autoParams: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    deBridgeTokenDeployer(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    defiController(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    deployNewAsset(
-      _nativeTokenAddress: PromiseOrValue<BytesLike>,
-      _nativeChainId: PromiseOrValue<BigNumberish>,
-      _name: PromiseOrValue<string>,
-      _symbol: PromiseOrValue<string>,
-      _decimals: PromiseOrValue<BigNumberish>,
-      _signatures: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    excessConfirmations(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    feeContractUpdater(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    feeDiscount(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    feeProxy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    flash(
-      _tokenAddress: PromiseOrValue<string>,
-      _receiver: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _data: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    flashFeeBps(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getAmountThreshold(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getChainFromConfig(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getChainId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getChainToConfig(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getDebridge(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getDebridgeChainAssetFixedFee(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _chainId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getDebridgeFeeInfo(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getDebridgeId(
-      _chainId: PromiseOrValue<BigNumberish>,
-      _tokenAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getDefiAvaliableReserves(
-      _tokenAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getDeployId(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _name: PromiseOrValue<string>,
-      _symbol: PromiseOrValue<string>,
-      _decimals: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getNativeInfo(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getRoleAdmin(
-      role: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getSubmissionIdFrom(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _receiver: PromiseOrValue<string>,
-      _nonce: PromiseOrValue<BigNumberish>,
-      _autoParams: IDeBridgeGate.SubmissionAutoParamsFromStruct,
-      _hasAutoParams: PromiseOrValue<boolean>,
-      _sender: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getbDebridgeId(
-      _chainId: PromiseOrValue<BigNumberish>,
-      _tokenAddress: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    globalFixedNativeFee(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    globalTransferFeeBps(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    grantRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    hasRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    initialize(
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      _weth: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    isBlockedSubmission(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    isSubmissionUsed(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    lockedClaim(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    nonce(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    pause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    renounceRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    requestReserves(
-      _tokenAddress: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    returnReserves(
-      _tokenAddress: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    revokeRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    send(
-      _tokenAddress: PromiseOrValue<string>,
-      _amount: PromiseOrValue<BigNumberish>,
-      _chainIdTo: PromiseOrValue<BigNumberish>,
-      _receiver: PromiseOrValue<BytesLike>,
-      _permit: PromiseOrValue<BytesLike>,
-      _useAssetFee: PromiseOrValue<boolean>,
-      _referralCode: PromiseOrValue<BigNumberish>,
-      _autoParams: PromiseOrValue<BytesLike>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setCallProxy(
-      _callProxy: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setChainSupport(
-      _chainId: PromiseOrValue<BigNumberish>,
-      _isSupported: PromiseOrValue<boolean>,
-      _isChainFrom: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setDeBridgeTokenDeployer(
-      _deBridgeTokenDeployer: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setDefiController(
-      _defiController: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setFeeContractUpdater(
-      _value: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setFeeProxy(
-      _feeProxy: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setSignatureVerifier(
-      _verifier: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setWethGate(
-      _wethGate: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    signatureVerifier(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    supportsInterface(
-      interfaceId: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    unpause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    updateAsset(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _maxAmount: PromiseOrValue<BigNumberish>,
-      _minReservesBps: PromiseOrValue<BigNumberish>,
-      _amountThreshold: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    updateAssetFixedFees(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _supportedChainIds: PromiseOrValue<BigNumberish>[],
-      _assetFeesInfo: PromiseOrValue<BigNumberish>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    updateChainSupport(
-      _chainIds: PromiseOrValue<BigNumberish>[],
-      _chainSupportInfo: IDeBridgeGate.ChainSupportInfoStruct[],
-      _isChainFrom: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    updateExcessConfirmations(
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    updateFeeDiscount(
-      _address: PromiseOrValue<string>,
-      _discountFixBps: PromiseOrValue<BigNumberish>,
-      _discountTransferBps: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    updateFlashFee(
-      _flashFeeBps: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    updateGlobalFee(
-      _globalFixedNativeFee: PromiseOrValue<BigNumberish>,
-      _globalTransferFeeBps: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    weth(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    wethGate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    withdrawFee(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
+    "AutoRequestExecuted(bytes32,bool,address)": TypedContractEvent<
+      AutoRequestExecutedEvent.InputTuple,
+      AutoRequestExecutedEvent.OutputTuple,
+      AutoRequestExecutedEvent.OutputObject
+    >;
+    AutoRequestExecuted: TypedContractEvent<
+      AutoRequestExecutedEvent.InputTuple,
+      AutoRequestExecutedEvent.OutputTuple,
+      AutoRequestExecutedEvent.OutputObject
+    >;
+
+    "Blocked(bytes32)": TypedContractEvent<
+      BlockedEvent.InputTuple,
+      BlockedEvent.OutputTuple,
+      BlockedEvent.OutputObject
+    >;
+    Blocked: TypedContractEvent<
+      BlockedEvent.InputTuple,
+      BlockedEvent.OutputTuple,
+      BlockedEvent.OutputObject
+    >;
+
+    "CallProxyUpdated(address)": TypedContractEvent<
+      CallProxyUpdatedEvent.InputTuple,
+      CallProxyUpdatedEvent.OutputTuple,
+      CallProxyUpdatedEvent.OutputObject
+    >;
+    CallProxyUpdated: TypedContractEvent<
+      CallProxyUpdatedEvent.InputTuple,
+      CallProxyUpdatedEvent.OutputTuple,
+      CallProxyUpdatedEvent.OutputObject
+    >;
+
+    "ChainSupportUpdated(uint256,bool,bool)": TypedContractEvent<
+      ChainSupportUpdatedEvent.InputTuple,
+      ChainSupportUpdatedEvent.OutputTuple,
+      ChainSupportUpdatedEvent.OutputObject
+    >;
+    ChainSupportUpdated: TypedContractEvent<
+      ChainSupportUpdatedEvent.InputTuple,
+      ChainSupportUpdatedEvent.OutputTuple,
+      ChainSupportUpdatedEvent.OutputObject
+    >;
+
+    "ChainsSupportUpdated(uint256,tuple,bool)": TypedContractEvent<
+      ChainsSupportUpdatedEvent.InputTuple,
+      ChainsSupportUpdatedEvent.OutputTuple,
+      ChainsSupportUpdatedEvent.OutputObject
+    >;
+    ChainsSupportUpdated: TypedContractEvent<
+      ChainsSupportUpdatedEvent.InputTuple,
+      ChainsSupportUpdatedEvent.OutputTuple,
+      ChainsSupportUpdatedEvent.OutputObject
+    >;
+
+    "Claimed(bytes32,bytes32,uint256,address,uint256,uint256,bytes,bool)": TypedContractEvent<
+      ClaimedEvent.InputTuple,
+      ClaimedEvent.OutputTuple,
+      ClaimedEvent.OutputObject
+    >;
+    Claimed: TypedContractEvent<
+      ClaimedEvent.InputTuple,
+      ClaimedEvent.OutputTuple,
+      ClaimedEvent.OutputObject
+    >;
+
+    "FixedNativeFeeAutoUpdated(uint256)": TypedContractEvent<
+      FixedNativeFeeAutoUpdatedEvent.InputTuple,
+      FixedNativeFeeAutoUpdatedEvent.OutputTuple,
+      FixedNativeFeeAutoUpdatedEvent.OutputObject
+    >;
+    FixedNativeFeeAutoUpdated: TypedContractEvent<
+      FixedNativeFeeAutoUpdatedEvent.InputTuple,
+      FixedNativeFeeAutoUpdatedEvent.OutputTuple,
+      FixedNativeFeeAutoUpdatedEvent.OutputObject
+    >;
+
+    "FixedNativeFeeUpdated(uint256,uint256)": TypedContractEvent<
+      FixedNativeFeeUpdatedEvent.InputTuple,
+      FixedNativeFeeUpdatedEvent.OutputTuple,
+      FixedNativeFeeUpdatedEvent.OutputObject
+    >;
+    FixedNativeFeeUpdated: TypedContractEvent<
+      FixedNativeFeeUpdatedEvent.InputTuple,
+      FixedNativeFeeUpdatedEvent.OutputTuple,
+      FixedNativeFeeUpdatedEvent.OutputObject
+    >;
+
+    "Flash(address,address,address,uint256,uint256)": TypedContractEvent<
+      FlashEvent.InputTuple,
+      FlashEvent.OutputTuple,
+      FlashEvent.OutputObject
+    >;
+    Flash: TypedContractEvent<
+      FlashEvent.InputTuple,
+      FlashEvent.OutputTuple,
+      FlashEvent.OutputObject
+    >;
+
+    "Initialized(uint8)": TypedContractEvent<
+      InitializedEvent.InputTuple,
+      InitializedEvent.OutputTuple,
+      InitializedEvent.OutputObject
+    >;
+    Initialized: TypedContractEvent<
+      InitializedEvent.InputTuple,
+      InitializedEvent.OutputTuple,
+      InitializedEvent.OutputObject
+    >;
+
+    "MonitoringClaimEvent(bytes32,uint256,uint256)": TypedContractEvent<
+      MonitoringClaimEventEvent.InputTuple,
+      MonitoringClaimEventEvent.OutputTuple,
+      MonitoringClaimEventEvent.OutputObject
+    >;
+    MonitoringClaimEvent: TypedContractEvent<
+      MonitoringClaimEventEvent.InputTuple,
+      MonitoringClaimEventEvent.OutputTuple,
+      MonitoringClaimEventEvent.OutputObject
+    >;
+
+    "MonitoringSendEvent(bytes32,uint256,uint256,uint256)": TypedContractEvent<
+      MonitoringSendEventEvent.InputTuple,
+      MonitoringSendEventEvent.OutputTuple,
+      MonitoringSendEventEvent.OutputObject
+    >;
+    MonitoringSendEvent: TypedContractEvent<
+      MonitoringSendEventEvent.InputTuple,
+      MonitoringSendEventEvent.OutputTuple,
+      MonitoringSendEventEvent.OutputObject
+    >;
+
+    "PairAdded(bytes32,address,bytes,uint256,uint256,uint16)": TypedContractEvent<
+      PairAddedEvent.InputTuple,
+      PairAddedEvent.OutputTuple,
+      PairAddedEvent.OutputObject
+    >;
+    PairAdded: TypedContractEvent<
+      PairAddedEvent.InputTuple,
+      PairAddedEvent.OutputTuple,
+      PairAddedEvent.OutputObject
+    >;
+
+    "Paused(address)": TypedContractEvent<
+      PausedEvent.InputTuple,
+      PausedEvent.OutputTuple,
+      PausedEvent.OutputObject
+    >;
+    Paused: TypedContractEvent<
+      PausedEvent.InputTuple,
+      PausedEvent.OutputTuple,
+      PausedEvent.OutputObject
+    >;
+
+    "RoleAdminChanged(bytes32,bytes32,bytes32)": TypedContractEvent<
+      RoleAdminChangedEvent.InputTuple,
+      RoleAdminChangedEvent.OutputTuple,
+      RoleAdminChangedEvent.OutputObject
+    >;
+    RoleAdminChanged: TypedContractEvent<
+      RoleAdminChangedEvent.InputTuple,
+      RoleAdminChangedEvent.OutputTuple,
+      RoleAdminChangedEvent.OutputObject
+    >;
+
+    "RoleGranted(bytes32,address,address)": TypedContractEvent<
+      RoleGrantedEvent.InputTuple,
+      RoleGrantedEvent.OutputTuple,
+      RoleGrantedEvent.OutputObject
+    >;
+    RoleGranted: TypedContractEvent<
+      RoleGrantedEvent.InputTuple,
+      RoleGrantedEvent.OutputTuple,
+      RoleGrantedEvent.OutputObject
+    >;
+
+    "RoleRevoked(bytes32,address,address)": TypedContractEvent<
+      RoleRevokedEvent.InputTuple,
+      RoleRevokedEvent.OutputTuple,
+      RoleRevokedEvent.OutputObject
+    >;
+    RoleRevoked: TypedContractEvent<
+      RoleRevokedEvent.InputTuple,
+      RoleRevokedEvent.OutputTuple,
+      RoleRevokedEvent.OutputObject
+    >;
+
+    "Sent(bytes32,bytes32,uint256,bytes,uint256,uint256,uint32,tuple,bytes,address)": TypedContractEvent<
+      SentEvent.InputTuple,
+      SentEvent.OutputTuple,
+      SentEvent.OutputObject
+    >;
+    Sent: TypedContractEvent<
+      SentEvent.InputTuple,
+      SentEvent.OutputTuple,
+      SentEvent.OutputObject
+    >;
+
+    "Unblocked(bytes32)": TypedContractEvent<
+      UnblockedEvent.InputTuple,
+      UnblockedEvent.OutputTuple,
+      UnblockedEvent.OutputObject
+    >;
+    Unblocked: TypedContractEvent<
+      UnblockedEvent.InputTuple,
+      UnblockedEvent.OutputTuple,
+      UnblockedEvent.OutputObject
+    >;
+
+    "Unpaused(address)": TypedContractEvent<
+      UnpausedEvent.InputTuple,
+      UnpausedEvent.OutputTuple,
+      UnpausedEvent.OutputObject
+    >;
+    Unpaused: TypedContractEvent<
+      UnpausedEvent.InputTuple,
+      UnpausedEvent.OutputTuple,
+      UnpausedEvent.OutputObject
+    >;
+
+    "WithdrawnFee(bytes32,uint256)": TypedContractEvent<
+      WithdrawnFeeEvent.InputTuple,
+      WithdrawnFeeEvent.OutputTuple,
+      WithdrawnFeeEvent.OutputObject
+    >;
+    WithdrawnFee: TypedContractEvent<
+      WithdrawnFeeEvent.InputTuple,
+      WithdrawnFeeEvent.OutputTuple,
+      WithdrawnFeeEvent.OutputObject
+    >;
   };
 }

@@ -3,159 +3,156 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BigNumberish,
   BytesLike,
-  CallOverrides,
-  ContractTransaction,
-  Overrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
-} from "ethers";
-import type {
   FunctionFragment,
   Result,
+  Interface,
   EventFragment,
-} from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
+  AddressLike,
+  ContractRunner,
+  ContractMethod,
+  Listener,
+} from "ethers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
+  TypedLogDescription,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "../../../../common";
 
-export interface IDeBridgeTokenDeployerInterface extends utils.Interface {
-  functions: {
-    "deployAsset(bytes32,string,string,uint8)": FunctionFragment;
-  };
+export interface IDeBridgeTokenDeployerInterface extends Interface {
+  getFunction(nameOrSignature: "deployAsset"): FunctionFragment;
 
-  getFunction(nameOrSignatureOrTopic: "deployAsset"): FunctionFragment;
+  getEvent(nameOrSignatureOrTopic: "DeBridgeTokenDeployed"): EventFragment;
 
   encodeFunctionData(
     functionFragment: "deployAsset",
-    values: [
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BytesLike, string, string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
     functionFragment: "deployAsset",
     data: BytesLike
   ): Result;
-
-  events: {
-    "DeBridgeTokenDeployed(address,string,string,uint8)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "DeBridgeTokenDeployed"): EventFragment;
 }
 
-export interface DeBridgeTokenDeployedEventObject {
-  asset: string;
-  name: string;
-  symbol: string;
-  decimals: number;
+export namespace DeBridgeTokenDeployedEvent {
+  export type InputTuple = [
+    asset: AddressLike,
+    name: string,
+    symbol: string,
+    decimals: BigNumberish
+  ];
+  export type OutputTuple = [
+    asset: string,
+    name: string,
+    symbol: string,
+    decimals: bigint
+  ];
+  export interface OutputObject {
+    asset: string;
+    name: string;
+    symbol: string;
+    decimals: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type DeBridgeTokenDeployedEvent = TypedEvent<
-  [string, string, string, number],
-  DeBridgeTokenDeployedEventObject
->;
-
-export type DeBridgeTokenDeployedEventFilter =
-  TypedEventFilter<DeBridgeTokenDeployedEvent>;
 
 export interface IDeBridgeTokenDeployer extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): IDeBridgeTokenDeployer;
+  waitForDeployment(): Promise<this>;
 
   interface: IDeBridgeTokenDeployerInterface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  functions: {
-    deployAsset(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _name: PromiseOrValue<string>,
-      _symbol: PromiseOrValue<string>,
-      _decimals: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-  };
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  deployAsset(
-    _debridgeId: PromiseOrValue<BytesLike>,
-    _name: PromiseOrValue<string>,
-    _symbol: PromiseOrValue<string>,
-    _decimals: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
 
-  callStatic: {
-    deployAsset(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _name: PromiseOrValue<string>,
-      _symbol: PromiseOrValue<string>,
-      _decimals: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-  };
+  deployAsset: TypedContractMethod<
+    [
+      _debridgeId: BytesLike,
+      _name: string,
+      _symbol: string,
+      _decimals: BigNumberish
+    ],
+    [string],
+    "nonpayable"
+  >;
+
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
+
+  getFunction(
+    nameOrSignature: "deployAsset"
+  ): TypedContractMethod<
+    [
+      _debridgeId: BytesLike,
+      _name: string,
+      _symbol: string,
+      _decimals: BigNumberish
+    ],
+    [string],
+    "nonpayable"
+  >;
+
+  getEvent(
+    key: "DeBridgeTokenDeployed"
+  ): TypedContractEvent<
+    DeBridgeTokenDeployedEvent.InputTuple,
+    DeBridgeTokenDeployedEvent.OutputTuple,
+    DeBridgeTokenDeployedEvent.OutputObject
+  >;
 
   filters: {
-    "DeBridgeTokenDeployed(address,string,string,uint8)"(
-      asset?: null,
-      name?: null,
-      symbol?: null,
-      decimals?: null
-    ): DeBridgeTokenDeployedEventFilter;
-    DeBridgeTokenDeployed(
-      asset?: null,
-      name?: null,
-      symbol?: null,
-      decimals?: null
-    ): DeBridgeTokenDeployedEventFilter;
-  };
-
-  estimateGas: {
-    deployAsset(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _name: PromiseOrValue<string>,
-      _symbol: PromiseOrValue<string>,
-      _decimals: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    deployAsset(
-      _debridgeId: PromiseOrValue<BytesLike>,
-      _name: PromiseOrValue<string>,
-      _symbol: PromiseOrValue<string>,
-      _decimals: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
+    "DeBridgeTokenDeployed(address,string,string,uint8)": TypedContractEvent<
+      DeBridgeTokenDeployedEvent.InputTuple,
+      DeBridgeTokenDeployedEvent.OutputTuple,
+      DeBridgeTokenDeployedEvent.OutputObject
+    >;
+    DeBridgeTokenDeployed: TypedContractEvent<
+      DeBridgeTokenDeployedEvent.InputTuple,
+      DeBridgeTokenDeployedEvent.OutputTuple,
+      DeBridgeTokenDeployedEvent.OutputObject
+    >;
   };
 }

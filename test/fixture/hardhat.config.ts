@@ -1,5 +1,5 @@
-require("@nomiclabs/hardhat-ethers");
-require("@typechain/hardhat");
+import "@typechain/hardhat";
+import '@nomicfoundation/hardhat-toolbox';
 
 /**
  * @type import('hardhat/config').HardhatUserConfig

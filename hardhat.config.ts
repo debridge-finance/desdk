@@ -1,7 +1,6 @@
-import "@nomiclabs/hardhat-ethers";
-import "@nomiclabs/hardhat-waffle";
-import "@openzeppelin/hardhat-upgrades";
+import '@nomicfoundation/hardhat-toolbox';
 import "@typechain/hardhat";
+import "@openzeppelin/hardhat-upgrades";
 import { HardhatUserConfig, task } from "hardhat/config";
 
 /**

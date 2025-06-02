@@ -3,52 +3,29 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BigNumberish,
   BytesLike,
-  CallOverrides,
-  ContractTransaction,
-  Overrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
-} from "ethers";
-import type {
   FunctionFragment,
   Result,
+  Interface,
   EventFragment,
-} from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
+  AddressLike,
+  ContractRunner,
+  ContractMethod,
+  Listener,
+} from "ethers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
+  TypedLogDescription,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "../../../../common";
 
-export interface OraclesManagerInterface extends utils.Interface {
-  functions: {
-    "DEFAULT_ADMIN_ROLE()": FunctionFragment;
-    "addOracles(address[],bool[])": FunctionFragment;
-    "excessConfirmations()": FunctionFragment;
-    "getOracleInfo(address)": FunctionFragment;
-    "getRoleAdmin(bytes32)": FunctionFragment;
-    "grantRole(bytes32,address)": FunctionFragment;
-    "hasRole(bytes32,address)": FunctionFragment;
-    "minConfirmations()": FunctionFragment;
-    "oracleAddresses(uint256)": FunctionFragment;
-    "renounceRole(bytes32,address)": FunctionFragment;
-    "requiredOraclesCount()": FunctionFragment;
-    "revokeRole(bytes32,address)": FunctionFragment;
-    "setExcessConfirmations(uint8)": FunctionFragment;
-    "setMinConfirmations(uint8)": FunctionFragment;
-    "supportsInterface(bytes4)": FunctionFragment;
-    "updateOracle(address,bool,bool)": FunctionFragment;
-  };
-
+export interface OraclesManagerInterface extends Interface {
   getFunction(
-    nameOrSignatureOrTopic:
+    nameOrSignature:
       | "DEFAULT_ADMIN_ROLE"
       | "addOracles"
       | "excessConfirmations"
@@ -67,13 +44,25 @@ export interface OraclesManagerInterface extends utils.Interface {
       | "updateOracle"
   ): FunctionFragment;
 
+  getEvent(
+    nameOrSignatureOrTopic:
+      | "AddOracle"
+      | "DeployApproved"
+      | "Initialized"
+      | "RoleAdminChanged"
+      | "RoleGranted"
+      | "RoleRevoked"
+      | "SubmissionApproved"
+      | "UpdateOracle"
+  ): EventFragment;
+
   encodeFunctionData(
     functionFragment: "DEFAULT_ADMIN_ROLE",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "addOracles",
-    values: [PromiseOrValue<string>[], PromiseOrValue<boolean>[]]
+    values: [AddressLike[], boolean[]]
   ): string;
   encodeFunctionData(
     functionFragment: "excessConfirmations",
@@ -81,19 +70,19 @@ export interface OraclesManagerInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getOracleInfo",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
-    values: [PromiseOrValue<BytesLike>]
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "grantRole",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+    values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "hasRole",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+    values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "minConfirmations",
@@ -101,11 +90,11 @@ export interface OraclesManagerInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "oracleAddresses",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "renounceRole",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+    values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "requiredOraclesCount",
@@ -113,27 +102,23 @@ export interface OraclesManagerInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "revokeRole",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+    values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setExcessConfirmations",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setMinConfirmations",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
-    values: [PromiseOrValue<BytesLike>]
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "updateOracle",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<boolean>,
-      PromiseOrValue<boolean>
-    ]
+    values: [AddressLike, boolean, boolean]
   ): string;
 
   decodeFunctionResult(
@@ -188,609 +173,497 @@ export interface OraclesManagerInterface extends utils.Interface {
     functionFragment: "updateOracle",
     data: BytesLike
   ): Result;
-
-  events: {
-    "AddOracle(address,bool)": EventFragment;
-    "DeployApproved(bytes32)": EventFragment;
-    "Initialized(uint8)": EventFragment;
-    "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
-    "RoleGranted(bytes32,address,address)": EventFragment;
-    "RoleRevoked(bytes32,address,address)": EventFragment;
-    "SubmissionApproved(bytes32)": EventFragment;
-    "UpdateOracle(address,bool,bool)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "AddOracle"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "DeployApproved"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SubmissionApproved"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "UpdateOracle"): EventFragment;
 }
 
-export interface AddOracleEventObject {
-  oracle: string;
-  required: boolean;
+export namespace AddOracleEvent {
+  export type InputTuple = [oracle: AddressLike, required: boolean];
+  export type OutputTuple = [oracle: string, required: boolean];
+  export interface OutputObject {
+    oracle: string;
+    required: boolean;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type AddOracleEvent = TypedEvent<
-  [string, boolean],
-  AddOracleEventObject
->;
 
-export type AddOracleEventFilter = TypedEventFilter<AddOracleEvent>;
-
-export interface DeployApprovedEventObject {
-  deployId: string;
+export namespace DeployApprovedEvent {
+  export type InputTuple = [deployId: BytesLike];
+  export type OutputTuple = [deployId: string];
+  export interface OutputObject {
+    deployId: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type DeployApprovedEvent = TypedEvent<
-  [string],
-  DeployApprovedEventObject
->;
 
-export type DeployApprovedEventFilter = TypedEventFilter<DeployApprovedEvent>;
-
-export interface InitializedEventObject {
-  version: number;
+export namespace InitializedEvent {
+  export type InputTuple = [version: BigNumberish];
+  export type OutputTuple = [version: bigint];
+  export interface OutputObject {
+    version: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
 
-export type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
-
-export interface RoleAdminChangedEventObject {
-  role: string;
-  previousAdminRole: string;
-  newAdminRole: string;
+export namespace RoleAdminChangedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    previousAdminRole: BytesLike,
+    newAdminRole: BytesLike
+  ];
+  export type OutputTuple = [
+    role: string,
+    previousAdminRole: string,
+    newAdminRole: string
+  ];
+  export interface OutputObject {
+    role: string;
+    previousAdminRole: string;
+    newAdminRole: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type RoleAdminChangedEvent = TypedEvent<
-  [string, string, string],
-  RoleAdminChangedEventObject
->;
 
-export type RoleAdminChangedEventFilter =
-  TypedEventFilter<RoleAdminChangedEvent>;
-
-export interface RoleGrantedEventObject {
-  role: string;
-  account: string;
-  sender: string;
+export namespace RoleGrantedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    account: AddressLike,
+    sender: AddressLike
+  ];
+  export type OutputTuple = [role: string, account: string, sender: string];
+  export interface OutputObject {
+    role: string;
+    account: string;
+    sender: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type RoleGrantedEvent = TypedEvent<
-  [string, string, string],
-  RoleGrantedEventObject
->;
 
-export type RoleGrantedEventFilter = TypedEventFilter<RoleGrantedEvent>;
-
-export interface RoleRevokedEventObject {
-  role: string;
-  account: string;
-  sender: string;
+export namespace RoleRevokedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    account: AddressLike,
+    sender: AddressLike
+  ];
+  export type OutputTuple = [role: string, account: string, sender: string];
+  export interface OutputObject {
+    role: string;
+    account: string;
+    sender: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type RoleRevokedEvent = TypedEvent<
-  [string, string, string],
-  RoleRevokedEventObject
->;
 
-export type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
-
-export interface SubmissionApprovedEventObject {
-  submissionId: string;
+export namespace SubmissionApprovedEvent {
+  export type InputTuple = [submissionId: BytesLike];
+  export type OutputTuple = [submissionId: string];
+  export interface OutputObject {
+    submissionId: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type SubmissionApprovedEvent = TypedEvent<
-  [string],
-  SubmissionApprovedEventObject
->;
 
-export type SubmissionApprovedEventFilter =
-  TypedEventFilter<SubmissionApprovedEvent>;
-
-export interface UpdateOracleEventObject {
-  oracle: string;
-  required: boolean;
-  isValid: boolean;
+export namespace UpdateOracleEvent {
+  export type InputTuple = [
+    oracle: AddressLike,
+    required: boolean,
+    isValid: boolean
+  ];
+  export type OutputTuple = [
+    oracle: string,
+    required: boolean,
+    isValid: boolean
+  ];
+  export interface OutputObject {
+    oracle: string;
+    required: boolean;
+    isValid: boolean;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type UpdateOracleEvent = TypedEvent<
-  [string, boolean, boolean],
-  UpdateOracleEventObject
->;
-
-export type UpdateOracleEventFilter = TypedEventFilter<UpdateOracleEvent>;
 
 export interface OraclesManager extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): OraclesManager;
+  waitForDeployment(): Promise<this>;
 
   interface: OraclesManagerInterface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  functions: {
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-    addOracles(
-      _oracles: PromiseOrValue<string>[],
-      _required: PromiseOrValue<boolean>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
 
-    excessConfirmations(overrides?: CallOverrides): Promise<[number]>;
+  DEFAULT_ADMIN_ROLE: TypedContractMethod<[], [string], "view">;
 
-    getOracleInfo(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<
-      [boolean, boolean, boolean] & {
-        exist: boolean;
-        isValid: boolean;
-        required: boolean;
-      }
-    >;
-
-    getRoleAdmin(
-      role: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    grantRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    hasRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    minConfirmations(overrides?: CallOverrides): Promise<[number]>;
-
-    oracleAddresses(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    renounceRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    requiredOraclesCount(overrides?: CallOverrides): Promise<[number]>;
-
-    revokeRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    setExcessConfirmations(
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    setMinConfirmations(
-      _minConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    supportsInterface(
-      interfaceId: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    updateOracle(
-      _oracle: PromiseOrValue<string>,
-      _isValid: PromiseOrValue<boolean>,
-      _required: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-  };
-
-  DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-
-  addOracles(
-    _oracles: PromiseOrValue<string>[],
-    _required: PromiseOrValue<boolean>[],
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  excessConfirmations(overrides?: CallOverrides): Promise<number>;
-
-  getOracleInfo(
-    arg0: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<
-    [boolean, boolean, boolean] & {
-      exist: boolean;
-      isValid: boolean;
-      required: boolean;
-    }
+  addOracles: TypedContractMethod<
+    [_oracles: AddressLike[], _required: boolean[]],
+    [void],
+    "nonpayable"
   >;
 
-  getRoleAdmin(
-    role: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<string>;
+  excessConfirmations: TypedContractMethod<[], [bigint], "view">;
 
-  grantRole(
-    role: PromiseOrValue<BytesLike>,
-    account: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  hasRole(
-    role: PromiseOrValue<BytesLike>,
-    account: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  minConfirmations(overrides?: CallOverrides): Promise<number>;
-
-  oracleAddresses(
-    arg0: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  renounceRole(
-    role: PromiseOrValue<BytesLike>,
-    account: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  requiredOraclesCount(overrides?: CallOverrides): Promise<number>;
-
-  revokeRole(
-    role: PromiseOrValue<BytesLike>,
-    account: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setExcessConfirmations(
-    _excessConfirmations: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setMinConfirmations(
-    _minConfirmations: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  supportsInterface(
-    interfaceId: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  updateOracle(
-    _oracle: PromiseOrValue<string>,
-    _isValid: PromiseOrValue<boolean>,
-    _required: PromiseOrValue<boolean>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  callStatic: {
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-
-    addOracles(
-      _oracles: PromiseOrValue<string>[],
-      _required: PromiseOrValue<boolean>[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    excessConfirmations(overrides?: CallOverrides): Promise<number>;
-
-    getOracleInfo(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<
+  getOracleInfo: TypedContractMethod<
+    [arg0: AddressLike],
+    [
       [boolean, boolean, boolean] & {
         exist: boolean;
         isValid: boolean;
         required: boolean;
       }
-    >;
+    ],
+    "view"
+  >;
 
-    getRoleAdmin(
-      role: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<string>;
+  getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
 
-    grantRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
+  grantRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    hasRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
+  hasRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [boolean],
+    "view"
+  >;
 
-    minConfirmations(overrides?: CallOverrides): Promise<number>;
+  minConfirmations: TypedContractMethod<[], [bigint], "view">;
 
-    oracleAddresses(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<string>;
+  oracleAddresses: TypedContractMethod<[arg0: BigNumberish], [string], "view">;
 
-    renounceRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
+  renounceRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    requiredOraclesCount(overrides?: CallOverrides): Promise<number>;
+  requiredOraclesCount: TypedContractMethod<[], [bigint], "view">;
 
-    revokeRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
+  revokeRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-    setExcessConfirmations(
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
+  setExcessConfirmations: TypedContractMethod<
+    [_excessConfirmations: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
-    setMinConfirmations(
-      _minConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
+  setMinConfirmations: TypedContractMethod<
+    [_minConfirmations: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
-    supportsInterface(
-      interfaceId: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
+  supportsInterface: TypedContractMethod<
+    [interfaceId: BytesLike],
+    [boolean],
+    "view"
+  >;
 
-    updateOracle(
-      _oracle: PromiseOrValue<string>,
-      _isValid: PromiseOrValue<boolean>,
-      _required: PromiseOrValue<boolean>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-  };
+  updateOracle: TypedContractMethod<
+    [_oracle: AddressLike, _isValid: boolean, _required: boolean],
+    [void],
+    "nonpayable"
+  >;
+
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
+
+  getFunction(
+    nameOrSignature: "DEFAULT_ADMIN_ROLE"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "addOracles"
+  ): TypedContractMethod<
+    [_oracles: AddressLike[], _required: boolean[]],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "excessConfirmations"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getOracleInfo"
+  ): TypedContractMethod<
+    [arg0: AddressLike],
+    [
+      [boolean, boolean, boolean] & {
+        exist: boolean;
+        isValid: boolean;
+        required: boolean;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getRoleAdmin"
+  ): TypedContractMethod<[role: BytesLike], [string], "view">;
+  getFunction(
+    nameOrSignature: "grantRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "hasRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [boolean],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "minConfirmations"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "oracleAddresses"
+  ): TypedContractMethod<[arg0: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "renounceRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "requiredOraclesCount"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "revokeRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "setExcessConfirmations"
+  ): TypedContractMethod<
+    [_excessConfirmations: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "setMinConfirmations"
+  ): TypedContractMethod<
+    [_minConfirmations: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "supportsInterface"
+  ): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "updateOracle"
+  ): TypedContractMethod<
+    [_oracle: AddressLike, _isValid: boolean, _required: boolean],
+    [void],
+    "nonpayable"
+  >;
+
+  getEvent(
+    key: "AddOracle"
+  ): TypedContractEvent<
+    AddOracleEvent.InputTuple,
+    AddOracleEvent.OutputTuple,
+    AddOracleEvent.OutputObject
+  >;
+  getEvent(
+    key: "DeployApproved"
+  ): TypedContractEvent<
+    DeployApprovedEvent.InputTuple,
+    DeployApprovedEvent.OutputTuple,
+    DeployApprovedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Initialized"
+  ): TypedContractEvent<
+    InitializedEvent.InputTuple,
+    InitializedEvent.OutputTuple,
+    InitializedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleAdminChanged"
+  ): TypedContractEvent<
+    RoleAdminChangedEvent.InputTuple,
+    RoleAdminChangedEvent.OutputTuple,
+    RoleAdminChangedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleGranted"
+  ): TypedContractEvent<
+    RoleGrantedEvent.InputTuple,
+    RoleGrantedEvent.OutputTuple,
+    RoleGrantedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleRevoked"
+  ): TypedContractEvent<
+    RoleRevokedEvent.InputTuple,
+    RoleRevokedEvent.OutputTuple,
+    RoleRevokedEvent.OutputObject
+  >;
+  getEvent(
+    key: "SubmissionApproved"
+  ): TypedContractEvent<
+    SubmissionApprovedEvent.InputTuple,
+    SubmissionApprovedEvent.OutputTuple,
+    SubmissionApprovedEvent.OutputObject
+  >;
+  getEvent(
+    key: "UpdateOracle"
+  ): TypedContractEvent<
+    UpdateOracleEvent.InputTuple,
+    UpdateOracleEvent.OutputTuple,
+    UpdateOracleEvent.OutputObject
+  >;
 
   filters: {
-    "AddOracle(address,bool)"(
-      oracle?: null,
-      required?: null
-    ): AddOracleEventFilter;
-    AddOracle(oracle?: null, required?: null): AddOracleEventFilter;
+    "AddOracle(address,bool)": TypedContractEvent<
+      AddOracleEvent.InputTuple,
+      AddOracleEvent.OutputTuple,
+      AddOracleEvent.OutputObject
+    >;
+    AddOracle: TypedContractEvent<
+      AddOracleEvent.InputTuple,
+      AddOracleEvent.OutputTuple,
+      AddOracleEvent.OutputObject
+    >;
 
-    "DeployApproved(bytes32)"(deployId?: null): DeployApprovedEventFilter;
-    DeployApproved(deployId?: null): DeployApprovedEventFilter;
+    "DeployApproved(bytes32)": TypedContractEvent<
+      DeployApprovedEvent.InputTuple,
+      DeployApprovedEvent.OutputTuple,
+      DeployApprovedEvent.OutputObject
+    >;
+    DeployApproved: TypedContractEvent<
+      DeployApprovedEvent.InputTuple,
+      DeployApprovedEvent.OutputTuple,
+      DeployApprovedEvent.OutputObject
+    >;
 
-    "Initialized(uint8)"(version?: null): InitializedEventFilter;
-    Initialized(version?: null): InitializedEventFilter;
+    "Initialized(uint8)": TypedContractEvent<
+      InitializedEvent.InputTuple,
+      InitializedEvent.OutputTuple,
+      InitializedEvent.OutputObject
+    >;
+    Initialized: TypedContractEvent<
+      InitializedEvent.InputTuple,
+      InitializedEvent.OutputTuple,
+      InitializedEvent.OutputObject
+    >;
 
-    "RoleAdminChanged(bytes32,bytes32,bytes32)"(
-      role?: PromiseOrValue<BytesLike> | null,
-      previousAdminRole?: PromiseOrValue<BytesLike> | null,
-      newAdminRole?: PromiseOrValue<BytesLike> | null
-    ): RoleAdminChangedEventFilter;
-    RoleAdminChanged(
-      role?: PromiseOrValue<BytesLike> | null,
-      previousAdminRole?: PromiseOrValue<BytesLike> | null,
-      newAdminRole?: PromiseOrValue<BytesLike> | null
-    ): RoleAdminChangedEventFilter;
+    "RoleAdminChanged(bytes32,bytes32,bytes32)": TypedContractEvent<
+      RoleAdminChangedEvent.InputTuple,
+      RoleAdminChangedEvent.OutputTuple,
+      RoleAdminChangedEvent.OutputObject
+    >;
+    RoleAdminChanged: TypedContractEvent<
+      RoleAdminChangedEvent.InputTuple,
+      RoleAdminChangedEvent.OutputTuple,
+      RoleAdminChangedEvent.OutputObject
+    >;
 
-    "RoleGranted(bytes32,address,address)"(
-      role?: PromiseOrValue<BytesLike> | null,
-      account?: PromiseOrValue<string> | null,
-      sender?: PromiseOrValue<string> | null
-    ): RoleGrantedEventFilter;
-    RoleGranted(
-      role?: PromiseOrValue<BytesLike> | null,
-      account?: PromiseOrValue<string> | null,
-      sender?: PromiseOrValue<string> | null
-    ): RoleGrantedEventFilter;
+    "RoleGranted(bytes32,address,address)": TypedContractEvent<
+      RoleGrantedEvent.InputTuple,
+      RoleGrantedEvent.OutputTuple,
+      RoleGrantedEvent.OutputObject
+    >;
+    RoleGranted: TypedContractEvent<
+      RoleGrantedEvent.InputTuple,
+      RoleGrantedEvent.OutputTuple,
+      RoleGrantedEvent.OutputObject
+    >;
 
-    "RoleRevoked(bytes32,address,address)"(
-      role?: PromiseOrValue<BytesLike> | null,
-      account?: PromiseOrValue<string> | null,
-      sender?: PromiseOrValue<string> | null
-    ): RoleRevokedEventFilter;
-    RoleRevoked(
-      role?: PromiseOrValue<BytesLike> | null,
-      account?: PromiseOrValue<string> | null,
-      sender?: PromiseOrValue<string> | null
-    ): RoleRevokedEventFilter;
+    "RoleRevoked(bytes32,address,address)": TypedContractEvent<
+      RoleRevokedEvent.InputTuple,
+      RoleRevokedEvent.OutputTuple,
+      RoleRevokedEvent.OutputObject
+    >;
+    RoleRevoked: TypedContractEvent<
+      RoleRevokedEvent.InputTuple,
+      RoleRevokedEvent.OutputTuple,
+      RoleRevokedEvent.OutputObject
+    >;
 
-    "SubmissionApproved(bytes32)"(
-      submissionId?: null
-    ): SubmissionApprovedEventFilter;
-    SubmissionApproved(submissionId?: null): SubmissionApprovedEventFilter;
+    "SubmissionApproved(bytes32)": TypedContractEvent<
+      SubmissionApprovedEvent.InputTuple,
+      SubmissionApprovedEvent.OutputTuple,
+      SubmissionApprovedEvent.OutputObject
+    >;
+    SubmissionApproved: TypedContractEvent<
+      SubmissionApprovedEvent.InputTuple,
+      SubmissionApprovedEvent.OutputTuple,
+      SubmissionApprovedEvent.OutputObject
+    >;
 
-    "UpdateOracle(address,bool,bool)"(
-      oracle?: null,
-      required?: null,
-      isValid?: null
-    ): UpdateOracleEventFilter;
-    UpdateOracle(
-      oracle?: null,
-      required?: null,
-      isValid?: null
-    ): UpdateOracleEventFilter;
-  };
-
-  estimateGas: {
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    addOracles(
-      _oracles: PromiseOrValue<string>[],
-      _required: PromiseOrValue<boolean>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    excessConfirmations(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getOracleInfo(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getRoleAdmin(
-      role: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    grantRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    hasRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    minConfirmations(overrides?: CallOverrides): Promise<BigNumber>;
-
-    oracleAddresses(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    renounceRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    requiredOraclesCount(overrides?: CallOverrides): Promise<BigNumber>;
-
-    revokeRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setExcessConfirmations(
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setMinConfirmations(
-      _minConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    supportsInterface(
-      interfaceId: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    updateOracle(
-      _oracle: PromiseOrValue<string>,
-      _isValid: PromiseOrValue<boolean>,
-      _required: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    DEFAULT_ADMIN_ROLE(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    addOracles(
-      _oracles: PromiseOrValue<string>[],
-      _required: PromiseOrValue<boolean>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    excessConfirmations(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getOracleInfo(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getRoleAdmin(
-      role: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    grantRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    hasRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    minConfirmations(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    oracleAddresses(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    renounceRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    requiredOraclesCount(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    revokeRole(
-      role: PromiseOrValue<BytesLike>,
-      account: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setExcessConfirmations(
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setMinConfirmations(
-      _minConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    supportsInterface(
-      interfaceId: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    updateOracle(
-      _oracle: PromiseOrValue<string>,
-      _isValid: PromiseOrValue<boolean>,
-      _required: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
+    "UpdateOracle(address,bool,bool)": TypedContractEvent<
+      UpdateOracleEvent.InputTuple,
+      UpdateOracleEvent.OutputTuple,
+      UpdateOracleEvent.OutputObject
+    >;
+    UpdateOracle: TypedContractEvent<
+      UpdateOracleEvent.InputTuple,
+      UpdateOracleEvent.OutputTuple,
+      UpdateOracleEvent.OutputObject
+    >;
   };
 }

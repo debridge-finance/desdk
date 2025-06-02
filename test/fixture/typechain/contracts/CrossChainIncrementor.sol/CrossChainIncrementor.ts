@@ -3,36 +3,26 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BigNumberish,
   BytesLike,
-  CallOverrides,
-  ContractTransaction,
-  PayableOverrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
+  FunctionFragment,
+  Result,
+  Interface,
+  ContractRunner,
+  ContractMethod,
+  Listener,
 } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "../../common";
 
-export interface CrossChainIncrementorInterface extends utils.Interface {
-  functions: {
-    "deBridgeGate()": FunctionFragment;
-    "increment(uint8)": FunctionFragment;
-    "incrementMulti(uint8[])": FunctionFragment;
-    "incrementWithIncludedGas(uint8,uint256)": FunctionFragment;
-  };
-
+export interface CrossChainIncrementorInterface extends Interface {
   getFunction(
-    nameOrSignatureOrTopic:
+    nameOrSignature:
       | "deBridgeGate"
       | "increment"
       | "incrementMulti"
@@ -45,15 +35,15 @@ export interface CrossChainIncrementorInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "increment",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "incrementMulti",
-    values: [PromiseOrValue<BigNumberish>[]]
+    values: [BigNumberish[]]
   ): string;
   encodeFunctionData(
     functionFragment: "incrementWithIncludedGas",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+    values: [BigNumberish, BigNumberish]
   ): string;
 
   decodeFunctionResult(
@@ -69,133 +59,87 @@ export interface CrossChainIncrementorInterface extends utils.Interface {
     functionFragment: "incrementWithIncludedGas",
     data: BytesLike
   ): Result;
-
-  events: {};
 }
 
 export interface CrossChainIncrementor extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): CrossChainIncrementor;
+  waitForDeployment(): Promise<this>;
 
   interface: CrossChainIncrementorInterface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  functions: {
-    deBridgeGate(overrides?: CallOverrides): Promise<[string]>;
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-    increment(
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
 
-    incrementMulti(
-      _amounts: PromiseOrValue<BigNumberish>[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  deBridgeGate: TypedContractMethod<[], [string], "view">;
 
-    incrementWithIncludedGas(
-      _amount: PromiseOrValue<BigNumberish>,
-      _executionFee: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-  };
+  increment: TypedContractMethod<[_amount: BigNumberish], [void], "payable">;
 
-  deBridgeGate(overrides?: CallOverrides): Promise<string>;
+  incrementMulti: TypedContractMethod<
+    [_amounts: BigNumberish[]],
+    [void],
+    "payable"
+  >;
 
-  increment(
-    _amount: PromiseOrValue<BigNumberish>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  incrementWithIncludedGas: TypedContractMethod<
+    [_amount: BigNumberish, _executionFee: BigNumberish],
+    [void],
+    "payable"
+  >;
 
-  incrementMulti(
-    _amounts: PromiseOrValue<BigNumberish>[],
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
 
-  incrementWithIncludedGas(
-    _amount: PromiseOrValue<BigNumberish>,
-    _executionFee: PromiseOrValue<BigNumberish>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  callStatic: {
-    deBridgeGate(overrides?: CallOverrides): Promise<string>;
-
-    increment(
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    incrementMulti(
-      _amounts: PromiseOrValue<BigNumberish>[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    incrementWithIncludedGas(
-      _amount: PromiseOrValue<BigNumberish>,
-      _executionFee: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-  };
+  getFunction(
+    nameOrSignature: "deBridgeGate"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "increment"
+  ): TypedContractMethod<[_amount: BigNumberish], [void], "payable">;
+  getFunction(
+    nameOrSignature: "incrementMulti"
+  ): TypedContractMethod<[_amounts: BigNumberish[]], [void], "payable">;
+  getFunction(
+    nameOrSignature: "incrementWithIncludedGas"
+  ): TypedContractMethod<
+    [_amount: BigNumberish, _executionFee: BigNumberish],
+    [void],
+    "payable"
+  >;
 
   filters: {};
-
-  estimateGas: {
-    deBridgeGate(overrides?: CallOverrides): Promise<BigNumber>;
-
-    increment(
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    incrementMulti(
-      _amounts: PromiseOrValue<BigNumberish>[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    incrementWithIncludedGas(
-      _amount: PromiseOrValue<BigNumberish>,
-      _executionFee: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    deBridgeGate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    increment(
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    incrementMulti(
-      _amounts: PromiseOrValue<BigNumberish>[],
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    incrementWithIncludedGas(
-      _amount: PromiseOrValue<BigNumberish>,
-      _executionFee: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-  };
 }

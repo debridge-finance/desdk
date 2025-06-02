@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES2015",
-    "module": "ES2015",
+    "target": "ES2020",
+    "module": "ES2020",
     "moduleResolution": "node",
     "declaration": true,
     "declarationMap": true,
@@ -14,6 +14,7 @@
       "es5",
       "dom"
     ],
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */,
   },
   "exclude": ["lib", "node_modules"],
   "include": ["src"],

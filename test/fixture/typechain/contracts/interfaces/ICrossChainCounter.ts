@@ -3,187 +3,215 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BigNumberish,
   BytesLike,
-  CallOverrides,
-  ContractTransaction,
-  Overrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
-} from "ethers";
-import type {
   FunctionFragment,
   Result,
+  Interface,
   EventFragment,
-} from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
+  AddressLike,
+  ContractRunner,
+  ContractMethod,
+  Listener,
+} from "ethers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
+  TypedLogDescription,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "../../common";
 
-export interface ICrossChainCounterInterface extends utils.Interface {
-  functions: {
-    "receiveIncrementCommand(uint8,address)": FunctionFragment;
-  };
+export interface ICrossChainCounterInterface extends Interface {
+  getFunction(nameOrSignature: "receiveIncrementCommand"): FunctionFragment;
 
-  getFunction(
-    nameOrSignatureOrTopic: "receiveIncrementCommand"
-  ): FunctionFragment;
+  getEvent(
+    nameOrSignatureOrTopic:
+      | "CounterIncremented"
+      | "SupportedChainAdded"
+      | "SupportedChainRemoved"
+  ): EventFragment;
 
   encodeFunctionData(
     functionFragment: "receiveIncrementCommand",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
+    values: [BigNumberish, AddressLike]
   ): string;
 
   decodeFunctionResult(
     functionFragment: "receiveIncrementCommand",
     data: BytesLike
   ): Result;
-
-  events: {
-    "CounterIncremented(uint256,uint8,uint256,address)": EventFragment;
-    "SupportedChainAdded(uint256,bytes)": EventFragment;
-    "SupportedChainRemoved(uint256)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "CounterIncremented"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SupportedChainAdded"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SupportedChainRemoved"): EventFragment;
 }
 
-export interface CounterIncrementedEventObject {
-  newCounterValue: BigNumber;
-  amount: number;
-  chainFrom: BigNumber;
-  initiator: string;
+export namespace CounterIncrementedEvent {
+  export type InputTuple = [
+    newCounterValue: BigNumberish,
+    amount: BigNumberish,
+    chainFrom: BigNumberish,
+    initiator: AddressLike
+  ];
+  export type OutputTuple = [
+    newCounterValue: bigint,
+    amount: bigint,
+    chainFrom: bigint,
+    initiator: string
+  ];
+  export interface OutputObject {
+    newCounterValue: bigint;
+    amount: bigint;
+    chainFrom: bigint;
+    initiator: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type CounterIncrementedEvent = TypedEvent<
-  [BigNumber, number, BigNumber, string],
-  CounterIncrementedEventObject
->;
 
-export type CounterIncrementedEventFilter =
-  TypedEventFilter<CounterIncrementedEvent>;
-
-export interface SupportedChainAddedEventObject {
-  chainId: BigNumber;
-  incrementorAddress: string;
+export namespace SupportedChainAddedEvent {
+  export type InputTuple = [
+    chainId: BigNumberish,
+    incrementorAddress: BytesLike
+  ];
+  export type OutputTuple = [chainId: bigint, incrementorAddress: string];
+  export interface OutputObject {
+    chainId: bigint;
+    incrementorAddress: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type SupportedChainAddedEvent = TypedEvent<
-  [BigNumber, string],
-  SupportedChainAddedEventObject
->;
 
-export type SupportedChainAddedEventFilter =
-  TypedEventFilter<SupportedChainAddedEvent>;
-
-export interface SupportedChainRemovedEventObject {
-  chainId: BigNumber;
+export namespace SupportedChainRemovedEvent {
+  export type InputTuple = [chainId: BigNumberish];
+  export type OutputTuple = [chainId: bigint];
+  export interface OutputObject {
+    chainId: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type SupportedChainRemovedEvent = TypedEvent<
-  [BigNumber],
-  SupportedChainRemovedEventObject
->;
-
-export type SupportedChainRemovedEventFilter =
-  TypedEventFilter<SupportedChainRemovedEvent>;
 
 export interface ICrossChainCounter extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): ICrossChainCounter;
+  waitForDeployment(): Promise<this>;
 
   interface: ICrossChainCounterInterface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  functions: {
-    receiveIncrementCommand(
-      _amount: PromiseOrValue<BigNumberish>,
-      _initiator: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-  };
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  receiveIncrementCommand(
-    _amount: PromiseOrValue<BigNumberish>,
-    _initiator: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
 
-  callStatic: {
-    receiveIncrementCommand(
-      _amount: PromiseOrValue<BigNumberish>,
-      _initiator: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-  };
+  receiveIncrementCommand: TypedContractMethod<
+    [_amount: BigNumberish, _initiator: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
+
+  getFunction(
+    nameOrSignature: "receiveIncrementCommand"
+  ): TypedContractMethod<
+    [_amount: BigNumberish, _initiator: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  getEvent(
+    key: "CounterIncremented"
+  ): TypedContractEvent<
+    CounterIncrementedEvent.InputTuple,
+    CounterIncrementedEvent.OutputTuple,
+    CounterIncrementedEvent.OutputObject
+  >;
+  getEvent(
+    key: "SupportedChainAdded"
+  ): TypedContractEvent<
+    SupportedChainAddedEvent.InputTuple,
+    SupportedChainAddedEvent.OutputTuple,
+    SupportedChainAddedEvent.OutputObject
+  >;
+  getEvent(
+    key: "SupportedChainRemoved"
+  ): TypedContractEvent<
+    SupportedChainRemovedEvent.InputTuple,
+    SupportedChainRemovedEvent.OutputTuple,
+    SupportedChainRemovedEvent.OutputObject
+  >;
 
   filters: {
-    "CounterIncremented(uint256,uint8,uint256,address)"(
-      newCounterValue?: null,
-      amount?: null,
-      chainFrom?: null,
-      initiator?: null
-    ): CounterIncrementedEventFilter;
-    CounterIncremented(
-      newCounterValue?: null,
-      amount?: null,
-      chainFrom?: null,
-      initiator?: null
-    ): CounterIncrementedEventFilter;
+    "CounterIncremented(uint256,uint8,uint256,address)": TypedContractEvent<
+      CounterIncrementedEvent.InputTuple,
+      CounterIncrementedEvent.OutputTuple,
+      CounterIncrementedEvent.OutputObject
+    >;
+    CounterIncremented: TypedContractEvent<
+      CounterIncrementedEvent.InputTuple,
+      CounterIncrementedEvent.OutputTuple,
+      CounterIncrementedEvent.OutputObject
+    >;
 
-    "SupportedChainAdded(uint256,bytes)"(
-      chainId?: null,
-      incrementorAddress?: null
-    ): SupportedChainAddedEventFilter;
-    SupportedChainAdded(
-      chainId?: null,
-      incrementorAddress?: null
-    ): SupportedChainAddedEventFilter;
+    "SupportedChainAdded(uint256,bytes)": TypedContractEvent<
+      SupportedChainAddedEvent.InputTuple,
+      SupportedChainAddedEvent.OutputTuple,
+      SupportedChainAddedEvent.OutputObject
+    >;
+    SupportedChainAdded: TypedContractEvent<
+      SupportedChainAddedEvent.InputTuple,
+      SupportedChainAddedEvent.OutputTuple,
+      SupportedChainAddedEvent.OutputObject
+    >;
 
-    "SupportedChainRemoved(uint256)"(
-      chainId?: null
-    ): SupportedChainRemovedEventFilter;
-    SupportedChainRemoved(chainId?: null): SupportedChainRemovedEventFilter;
-  };
-
-  estimateGas: {
-    receiveIncrementCommand(
-      _amount: PromiseOrValue<BigNumberish>,
-      _initiator: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    receiveIncrementCommand(
-      _amount: PromiseOrValue<BigNumberish>,
-      _initiator: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
+    "SupportedChainRemoved(uint256)": TypedContractEvent<
+      SupportedChainRemovedEvent.InputTuple,
+      SupportedChainRemovedEvent.OutputTuple,
+      SupportedChainRemovedEvent.OutputObject
+    >;
+    SupportedChainRemoved: TypedContractEvent<
+      SupportedChainRemovedEvent.InputTuple,
+      SupportedChainRemovedEvent.OutputTuple,
+      SupportedChainRemovedEvent.OutputObject
+    >;
   };
 }

@@ -2,8 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { Contract, Interface, type ContractRunner } from "ethers";
 import type {
   IFlashCallback,
   IFlashCallbackInterface,
@@ -28,17 +27,17 @@ const _abi = [
     stateMutability: "nonpayable",
     type: "function",
   },
-];
+] as const;
 
 export class IFlashCallback__factory {
   static readonly abi = _abi;
   static createInterface(): IFlashCallbackInterface {
-    return new utils.Interface(_abi) as IFlashCallbackInterface;
+    return new Interface(_abi) as IFlashCallbackInterface;
   }
   static connect(
     address: string,
-    signerOrProvider: Signer | Provider
+    runner?: ContractRunner | null
   ): IFlashCallback {
-    return new Contract(address, _abi, signerOrProvider) as IFlashCallback;
+    return new Contract(address, _abi, runner) as unknown as IFlashCallback;
   }
 }

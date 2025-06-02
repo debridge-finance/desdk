@@ -3,35 +3,25 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BytesLike,
-  CallOverrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
+  FunctionFragment,
+  Result,
+  Interface,
+  ContractRunner,
+  ContractMethod,
+  Listener,
 } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "../../../../common";
 
-export interface FlagsInterface extends utils.Interface {
-  functions: {
-    "MULTI_SEND()": FunctionFragment;
-    "PROXY_WITH_SENDER()": FunctionFragment;
-    "REVERT_IF_EXTERNAL_FAIL()": FunctionFragment;
-    "SEND_EXTERNAL_CALL_GAS_LIMIT()": FunctionFragment;
-    "SEND_HASHED_DATA()": FunctionFragment;
-    "UNWRAP_ETH()": FunctionFragment;
-  };
-
+export interface FlagsInterface extends Interface {
   getFunction(
-    nameOrSignatureOrTopic:
+    nameOrSignature:
       | "MULTI_SEND"
       | "PROXY_WITH_SENDER"
       | "REVERT_IF_EXTERNAL_FAIL"
@@ -83,109 +73,85 @@ export interface FlagsInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "UNWRAP_ETH", data: BytesLike): Result;
-
-  events: {};
 }
 
 export interface Flags extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): Flags;
+  waitForDeployment(): Promise<this>;
 
   interface: FlagsInterface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  functions: {
-    MULTI_SEND(overrides?: CallOverrides): Promise<[BigNumber]>;
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-    PROXY_WITH_SENDER(overrides?: CallOverrides): Promise<[BigNumber]>;
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
 
-    REVERT_IF_EXTERNAL_FAIL(overrides?: CallOverrides): Promise<[BigNumber]>;
+  MULTI_SEND: TypedContractMethod<[], [bigint], "view">;
 
-    SEND_EXTERNAL_CALL_GAS_LIMIT(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+  PROXY_WITH_SENDER: TypedContractMethod<[], [bigint], "view">;
 
-    SEND_HASHED_DATA(overrides?: CallOverrides): Promise<[BigNumber]>;
+  REVERT_IF_EXTERNAL_FAIL: TypedContractMethod<[], [bigint], "view">;
 
-    UNWRAP_ETH(overrides?: CallOverrides): Promise<[BigNumber]>;
-  };
+  SEND_EXTERNAL_CALL_GAS_LIMIT: TypedContractMethod<[], [bigint], "view">;
 
-  MULTI_SEND(overrides?: CallOverrides): Promise<BigNumber>;
+  SEND_HASHED_DATA: TypedContractMethod<[], [bigint], "view">;
 
-  PROXY_WITH_SENDER(overrides?: CallOverrides): Promise<BigNumber>;
+  UNWRAP_ETH: TypedContractMethod<[], [bigint], "view">;
 
-  REVERT_IF_EXTERNAL_FAIL(overrides?: CallOverrides): Promise<BigNumber>;
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
 
-  SEND_EXTERNAL_CALL_GAS_LIMIT(overrides?: CallOverrides): Promise<BigNumber>;
-
-  SEND_HASHED_DATA(overrides?: CallOverrides): Promise<BigNumber>;
-
-  UNWRAP_ETH(overrides?: CallOverrides): Promise<BigNumber>;
-
-  callStatic: {
-    MULTI_SEND(overrides?: CallOverrides): Promise<BigNumber>;
-
-    PROXY_WITH_SENDER(overrides?: CallOverrides): Promise<BigNumber>;
-
-    REVERT_IF_EXTERNAL_FAIL(overrides?: CallOverrides): Promise<BigNumber>;
-
-    SEND_EXTERNAL_CALL_GAS_LIMIT(overrides?: CallOverrides): Promise<BigNumber>;
-
-    SEND_HASHED_DATA(overrides?: CallOverrides): Promise<BigNumber>;
-
-    UNWRAP_ETH(overrides?: CallOverrides): Promise<BigNumber>;
-  };
+  getFunction(
+    nameOrSignature: "MULTI_SEND"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "PROXY_WITH_SENDER"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "REVERT_IF_EXTERNAL_FAIL"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "SEND_EXTERNAL_CALL_GAS_LIMIT"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "SEND_HASHED_DATA"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "UNWRAP_ETH"
+  ): TypedContractMethod<[], [bigint], "view">;
 
   filters: {};
-
-  estimateGas: {
-    MULTI_SEND(overrides?: CallOverrides): Promise<BigNumber>;
-
-    PROXY_WITH_SENDER(overrides?: CallOverrides): Promise<BigNumber>;
-
-    REVERT_IF_EXTERNAL_FAIL(overrides?: CallOverrides): Promise<BigNumber>;
-
-    SEND_EXTERNAL_CALL_GAS_LIMIT(overrides?: CallOverrides): Promise<BigNumber>;
-
-    SEND_HASHED_DATA(overrides?: CallOverrides): Promise<BigNumber>;
-
-    UNWRAP_ETH(overrides?: CallOverrides): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    MULTI_SEND(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    PROXY_WITH_SENDER(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    REVERT_IF_EXTERNAL_FAIL(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    SEND_EXTERNAL_CALL_GAS_LIMIT(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    SEND_HASHED_DATA(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    UNWRAP_ETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-  };
 }

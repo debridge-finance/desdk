@@ -2,8 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { Contract, Interface, type ContractRunner } from "ethers";
 import type {
   IDeBridgeTokenDeployer,
   IDeBridgeTokenDeployerInterface,
@@ -75,21 +74,21 @@ const _abi = [
     stateMutability: "nonpayable",
     type: "function",
   },
-];
+] as const;
 
 export class IDeBridgeTokenDeployer__factory {
   static readonly abi = _abi;
   static createInterface(): IDeBridgeTokenDeployerInterface {
-    return new utils.Interface(_abi) as IDeBridgeTokenDeployerInterface;
+    return new Interface(_abi) as IDeBridgeTokenDeployerInterface;
   }
   static connect(
     address: string,
-    signerOrProvider: Signer | Provider
+    runner?: ContractRunner | null
   ): IDeBridgeTokenDeployer {
     return new Contract(
       address,
       _abi,
-      signerOrProvider
-    ) as IDeBridgeTokenDeployer;
+      runner
+    ) as unknown as IDeBridgeTokenDeployer;
   }
 }

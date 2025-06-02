@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "ES2020",
     "module": "commonjs",
     "declaration": true,
     "declarationMap": true,
@@ -13,6 +13,7 @@
       "es5",
       "dom"
     ],
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */,
   },
   "exclude": ["lib", "node_modules"],
   "include": ["src"],

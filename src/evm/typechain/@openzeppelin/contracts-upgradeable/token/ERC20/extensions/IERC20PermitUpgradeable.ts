@@ -19,24 +19,44 @@ import type {
   TypedEventLog,
   TypedListener,
   TypedContractMethod,
-} from "../../../../common";
+} from "../../../../../common";
 
-export interface IWethGateInterface extends Interface {
-  getFunction(nameOrSignature: "withdraw"): FunctionFragment;
+export interface IERC20PermitUpgradeableInterface extends Interface {
+  getFunction(
+    nameOrSignature: "DOMAIN_SEPARATOR" | "nonces" | "permit"
+  ): FunctionFragment;
 
   encodeFunctionData(
-    functionFragment: "withdraw",
-    values: [AddressLike, BigNumberish]
+    functionFragment: "DOMAIN_SEPARATOR",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
+  encodeFunctionData(
+    functionFragment: "permit",
+    values: [
+      AddressLike,
+      AddressLike,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BytesLike,
+      BytesLike
+    ]
   ): string;
 
-  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "DOMAIN_SEPARATOR",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
 }
 
-export interface IWethGate extends BaseContract {
-  connect(runner?: ContractRunner | null): IWethGate;
+export interface IERC20PermitUpgradeable extends BaseContract {
+  connect(runner?: ContractRunner | null): IERC20PermitUpgradeable;
   waitForDeployment(): Promise<this>;
 
-  interface: IWethGateInterface;
+  interface: IERC20PermitUpgradeableInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
@@ -75,8 +95,20 @@ export interface IWethGate extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  withdraw: TypedContractMethod<
-    [receiver: AddressLike, wad: BigNumberish],
+  DOMAIN_SEPARATOR: TypedContractMethod<[], [string], "view">;
+
+  nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+
+  permit: TypedContractMethod<
+    [
+      owner: AddressLike,
+      spender: AddressLike,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike
+    ],
     [void],
     "nonpayable"
   >;
@@ -86,9 +118,23 @@ export interface IWethGate extends BaseContract {
   ): T;
 
   getFunction(
-    nameOrSignature: "withdraw"
+    nameOrSignature: "DOMAIN_SEPARATOR"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "nonces"
+  ): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "permit"
   ): TypedContractMethod<
-    [receiver: AddressLike, wad: BigNumberish],
+    [
+      owner: AddressLike,
+      spender: AddressLike,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike
+    ],
     [void],
     "nonpayable"
   >;

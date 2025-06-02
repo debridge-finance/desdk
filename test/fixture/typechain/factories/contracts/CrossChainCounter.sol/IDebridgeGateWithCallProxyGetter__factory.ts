@@ -2,8 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { Contract, Interface, type ContractRunner } from "ethers";
 import type {
   IDebridgeGateWithCallProxyGetter,
   IDebridgeGateWithCallProxyGetterInterface,
@@ -744,23 +743,21 @@ const _abi = [
     stateMutability: "nonpayable",
     type: "function",
   },
-];
+] as const;
 
 export class IDebridgeGateWithCallProxyGetter__factory {
   static readonly abi = _abi;
   static createInterface(): IDebridgeGateWithCallProxyGetterInterface {
-    return new utils.Interface(
-      _abi
-    ) as IDebridgeGateWithCallProxyGetterInterface;
+    return new Interface(_abi) as IDebridgeGateWithCallProxyGetterInterface;
   }
   static connect(
     address: string,
-    signerOrProvider: Signer | Provider
+    runner?: ContractRunner | null
   ): IDebridgeGateWithCallProxyGetter {
     return new Contract(
       address,
       _abi,
-      signerOrProvider
-    ) as IDebridgeGateWithCallProxyGetter;
+      runner
+    ) as unknown as IDebridgeGateWithCallProxyGetter;
   }
 }

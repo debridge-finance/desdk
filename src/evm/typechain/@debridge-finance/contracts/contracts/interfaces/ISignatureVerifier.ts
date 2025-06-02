@@ -3,159 +3,172 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BigNumberish,
   BytesLike,
-  CallOverrides,
-  ContractTransaction,
-  Overrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
-} from "ethers";
-import type {
   FunctionFragment,
   Result,
+  Interface,
   EventFragment,
-} from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
+  AddressLike,
+  ContractRunner,
+  ContractMethod,
+  Listener,
+} from "ethers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
+  TypedLogDescription,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "../../../../common";
 
-export interface ISignatureVerifierInterface extends utils.Interface {
-  functions: {
-    "submit(bytes32,bytes,uint8)": FunctionFragment;
-  };
+export interface ISignatureVerifierInterface extends Interface {
+  getFunction(nameOrSignature: "submit"): FunctionFragment;
 
-  getFunction(nameOrSignatureOrTopic: "submit"): FunctionFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "Confirmed" | "DeployConfirmed"
+  ): EventFragment;
 
   encodeFunctionData(
     functionFragment: "submit",
-    values: [
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [BytesLike, BytesLike, BigNumberish]
   ): string;
 
   decodeFunctionResult(functionFragment: "submit", data: BytesLike): Result;
-
-  events: {
-    "Confirmed(bytes32,address)": EventFragment;
-    "DeployConfirmed(bytes32,address)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "Confirmed"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "DeployConfirmed"): EventFragment;
 }
 
-export interface ConfirmedEventObject {
-  submissionId: string;
-  operator: string;
+export namespace ConfirmedEvent {
+  export type InputTuple = [submissionId: BytesLike, operator: AddressLike];
+  export type OutputTuple = [submissionId: string, operator: string];
+  export interface OutputObject {
+    submissionId: string;
+    operator: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type ConfirmedEvent = TypedEvent<[string, string], ConfirmedEventObject>;
 
-export type ConfirmedEventFilter = TypedEventFilter<ConfirmedEvent>;
-
-export interface DeployConfirmedEventObject {
-  deployId: string;
-  operator: string;
+export namespace DeployConfirmedEvent {
+  export type InputTuple = [deployId: BytesLike, operator: AddressLike];
+  export type OutputTuple = [deployId: string, operator: string];
+  export interface OutputObject {
+    deployId: string;
+    operator: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type DeployConfirmedEvent = TypedEvent<
-  [string, string],
-  DeployConfirmedEventObject
->;
-
-export type DeployConfirmedEventFilter = TypedEventFilter<DeployConfirmedEvent>;
 
 export interface ISignatureVerifier extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): ISignatureVerifier;
+  waitForDeployment(): Promise<this>;
 
   interface: ISignatureVerifierInterface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  functions: {
-    submit(
-      _submissionId: PromiseOrValue<BytesLike>,
-      _signatures: PromiseOrValue<BytesLike>,
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-  };
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  submit(
-    _submissionId: PromiseOrValue<BytesLike>,
-    _signatures: PromiseOrValue<BytesLike>,
-    _excessConfirmations: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
 
-  callStatic: {
-    submit(
-      _submissionId: PromiseOrValue<BytesLike>,
-      _signatures: PromiseOrValue<BytesLike>,
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-  };
+  submit: TypedContractMethod<
+    [
+      _submissionId: BytesLike,
+      _signatures: BytesLike,
+      _excessConfirmations: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
+
+  getFunction(
+    nameOrSignature: "submit"
+  ): TypedContractMethod<
+    [
+      _submissionId: BytesLike,
+      _signatures: BytesLike,
+      _excessConfirmations: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+
+  getEvent(
+    key: "Confirmed"
+  ): TypedContractEvent<
+    ConfirmedEvent.InputTuple,
+    ConfirmedEvent.OutputTuple,
+    ConfirmedEvent.OutputObject
+  >;
+  getEvent(
+    key: "DeployConfirmed"
+  ): TypedContractEvent<
+    DeployConfirmedEvent.InputTuple,
+    DeployConfirmedEvent.OutputTuple,
+    DeployConfirmedEvent.OutputObject
+  >;
 
   filters: {
-    "Confirmed(bytes32,address)"(
-      submissionId?: null,
-      operator?: null
-    ): ConfirmedEventFilter;
-    Confirmed(submissionId?: null, operator?: null): ConfirmedEventFilter;
+    "Confirmed(bytes32,address)": TypedContractEvent<
+      ConfirmedEvent.InputTuple,
+      ConfirmedEvent.OutputTuple,
+      ConfirmedEvent.OutputObject
+    >;
+    Confirmed: TypedContractEvent<
+      ConfirmedEvent.InputTuple,
+      ConfirmedEvent.OutputTuple,
+      ConfirmedEvent.OutputObject
+    >;
 
-    "DeployConfirmed(bytes32,address)"(
-      deployId?: null,
-      operator?: null
-    ): DeployConfirmedEventFilter;
-    DeployConfirmed(
-      deployId?: null,
-      operator?: null
-    ): DeployConfirmedEventFilter;
-  };
-
-  estimateGas: {
-    submit(
-      _submissionId: PromiseOrValue<BytesLike>,
-      _signatures: PromiseOrValue<BytesLike>,
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    submit(
-      _submissionId: PromiseOrValue<BytesLike>,
-      _signatures: PromiseOrValue<BytesLike>,
-      _excessConfirmations: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
+    "DeployConfirmed(bytes32,address)": TypedContractEvent<
+      DeployConfirmedEvent.InputTuple,
+      DeployConfirmedEvent.OutputTuple,
+      DeployConfirmedEvent.OutputObject
+    >;
+    DeployConfirmed: TypedContractEvent<
+      DeployConfirmedEvent.InputTuple,
+      DeployConfirmedEvent.OutputTuple,
+      DeployConfirmedEvent.OutputObject
+    >;
   };
 }

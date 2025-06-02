@@ -3,37 +3,27 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BigNumberish,
   BytesLike,
-  CallOverrides,
-  ContractTransaction,
-  Overrides,
-  PayableOverrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
+  FunctionFragment,
+  Result,
+  Interface,
+  AddressLike,
+  ContractRunner,
+  ContractMethod,
+  Listener,
 } from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "../../../../common";
 
-export interface ICallProxyInterface extends utils.Interface {
-  functions: {
-    "call(address,address,bytes,uint256,bytes,uint256)": FunctionFragment;
-    "callERC20(address,address,address,bytes,uint256,bytes,uint256)": FunctionFragment;
-    "submissionChainIdFrom()": FunctionFragment;
-    "submissionNativeSender()": FunctionFragment;
-  };
-
+export interface ICallProxyInterface extends Interface {
   getFunction(
-    nameOrSignatureOrTopic:
+    nameOrSignature:
       | "call"
       | "callERC20"
       | "submissionChainIdFrom"
@@ -43,24 +33,24 @@ export interface ICallProxyInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "call",
     values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>
+      AddressLike,
+      AddressLike,
+      BytesLike,
+      BigNumberish,
+      BytesLike,
+      BigNumberish
     ]
   ): string;
   encodeFunctionData(
     functionFragment: "callERC20",
     values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>
+      AddressLike,
+      AddressLike,
+      AddressLike,
+      BytesLike,
+      BigNumberish,
+      BytesLike,
+      BigNumberish
     ]
   ): string;
   encodeFunctionData(
@@ -82,184 +72,121 @@ export interface ICallProxyInterface extends utils.Interface {
     functionFragment: "submissionNativeSender",
     data: BytesLike
   ): Result;
-
-  events: {};
 }
 
 export interface ICallProxy extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): ICallProxy;
+  waitForDeployment(): Promise<this>;
 
   interface: ICallProxyInterface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  functions: {
-    call(
-      _reserveAddress: PromiseOrValue<string>,
-      _receiver: PromiseOrValue<string>,
-      _data: PromiseOrValue<BytesLike>,
-      _flags: PromiseOrValue<BigNumberish>,
-      _nativeSender: PromiseOrValue<BytesLike>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-    callERC20(
-      _token: PromiseOrValue<string>,
-      _reserveAddress: PromiseOrValue<string>,
-      _receiver: PromiseOrValue<string>,
-      _data: PromiseOrValue<BytesLike>,
-      _flags: PromiseOrValue<BigNumberish>,
-      _nativeSender: PromiseOrValue<BytesLike>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
 
-    submissionChainIdFrom(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  call: TypedContractMethod<
+    [
+      _reserveAddress: AddressLike,
+      _receiver: AddressLike,
+      _data: BytesLike,
+      _flags: BigNumberish,
+      _nativeSender: BytesLike,
+      _chainIdFrom: BigNumberish
+    ],
+    [boolean],
+    "payable"
+  >;
 
-    submissionNativeSender(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-  };
+  callERC20: TypedContractMethod<
+    [
+      _token: AddressLike,
+      _reserveAddress: AddressLike,
+      _receiver: AddressLike,
+      _data: BytesLike,
+      _flags: BigNumberish,
+      _nativeSender: BytesLike,
+      _chainIdFrom: BigNumberish
+    ],
+    [boolean],
+    "nonpayable"
+  >;
 
-  call(
-    _reserveAddress: PromiseOrValue<string>,
-    _receiver: PromiseOrValue<string>,
-    _data: PromiseOrValue<BytesLike>,
-    _flags: PromiseOrValue<BigNumberish>,
-    _nativeSender: PromiseOrValue<BytesLike>,
-    _chainIdFrom: PromiseOrValue<BigNumberish>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  submissionChainIdFrom: TypedContractMethod<[], [bigint], "nonpayable">;
 
-  callERC20(
-    _token: PromiseOrValue<string>,
-    _reserveAddress: PromiseOrValue<string>,
-    _receiver: PromiseOrValue<string>,
-    _data: PromiseOrValue<BytesLike>,
-    _flags: PromiseOrValue<BigNumberish>,
-    _nativeSender: PromiseOrValue<BytesLike>,
-    _chainIdFrom: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  submissionNativeSender: TypedContractMethod<[], [string], "nonpayable">;
 
-  submissionChainIdFrom(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
 
-  submissionNativeSender(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  callStatic: {
-    call(
-      _reserveAddress: PromiseOrValue<string>,
-      _receiver: PromiseOrValue<string>,
-      _data: PromiseOrValue<BytesLike>,
-      _flags: PromiseOrValue<BigNumberish>,
-      _nativeSender: PromiseOrValue<BytesLike>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    callERC20(
-      _token: PromiseOrValue<string>,
-      _reserveAddress: PromiseOrValue<string>,
-      _receiver: PromiseOrValue<string>,
-      _data: PromiseOrValue<BytesLike>,
-      _flags: PromiseOrValue<BigNumberish>,
-      _nativeSender: PromiseOrValue<BytesLike>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    submissionChainIdFrom(overrides?: CallOverrides): Promise<BigNumber>;
-
-    submissionNativeSender(overrides?: CallOverrides): Promise<string>;
-  };
+  getFunction(
+    nameOrSignature: "call"
+  ): TypedContractMethod<
+    [
+      _reserveAddress: AddressLike,
+      _receiver: AddressLike,
+      _data: BytesLike,
+      _flags: BigNumberish,
+      _nativeSender: BytesLike,
+      _chainIdFrom: BigNumberish
+    ],
+    [boolean],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "callERC20"
+  ): TypedContractMethod<
+    [
+      _token: AddressLike,
+      _reserveAddress: AddressLike,
+      _receiver: AddressLike,
+      _data: BytesLike,
+      _flags: BigNumberish,
+      _nativeSender: BytesLike,
+      _chainIdFrom: BigNumberish
+    ],
+    [boolean],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "submissionChainIdFrom"
+  ): TypedContractMethod<[], [bigint], "nonpayable">;
+  getFunction(
+    nameOrSignature: "submissionNativeSender"
+  ): TypedContractMethod<[], [string], "nonpayable">;
 
   filters: {};
-
-  estimateGas: {
-    call(
-      _reserveAddress: PromiseOrValue<string>,
-      _receiver: PromiseOrValue<string>,
-      _data: PromiseOrValue<BytesLike>,
-      _flags: PromiseOrValue<BigNumberish>,
-      _nativeSender: PromiseOrValue<BytesLike>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    callERC20(
-      _token: PromiseOrValue<string>,
-      _reserveAddress: PromiseOrValue<string>,
-      _receiver: PromiseOrValue<string>,
-      _data: PromiseOrValue<BytesLike>,
-      _flags: PromiseOrValue<BigNumberish>,
-      _nativeSender: PromiseOrValue<BytesLike>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    submissionChainIdFrom(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    submissionNativeSender(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    call(
-      _reserveAddress: PromiseOrValue<string>,
-      _receiver: PromiseOrValue<string>,
-      _data: PromiseOrValue<BytesLike>,
-      _flags: PromiseOrValue<BigNumberish>,
-      _nativeSender: PromiseOrValue<BytesLike>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    callERC20(
-      _token: PromiseOrValue<string>,
-      _reserveAddress: PromiseOrValue<string>,
-      _receiver: PromiseOrValue<string>,
-      _data: PromiseOrValue<BytesLike>,
-      _flags: PromiseOrValue<BigNumberish>,
-      _nativeSender: PromiseOrValue<BytesLike>,
-      _chainIdFrom: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    submissionChainIdFrom(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    submissionNativeSender(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-  };
 }

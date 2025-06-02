@@ -2,8 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer, utils } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { Contract, Interface, type ContractRunner } from "ethers";
 import type {
   ICrossChainCounter,
   ICrossChainCounterInterface,
@@ -128,17 +127,17 @@ const _abi = [
     stateMutability: "nonpayable",
     type: "function",
   },
-];
+] as const;
 
 export class ICrossChainCounter__factory {
   static readonly abi = _abi;
   static createInterface(): ICrossChainCounterInterface {
-    return new utils.Interface(_abi) as ICrossChainCounterInterface;
+    return new Interface(_abi) as ICrossChainCounterInterface;
   }
   static connect(
     address: string,
-    signerOrProvider: Signer | Provider
+    runner?: ContractRunner | null
   ): ICrossChainCounter {
-    return new Contract(address, _abi, signerOrProvider) as ICrossChainCounter;
+    return new Contract(address, _abi, runner) as unknown as ICrossChainCounter;
   }
 }
