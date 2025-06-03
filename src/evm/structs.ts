@@ -1,5 +1,5 @@
+import { AbiCoder, BytesLike, ParamType } from "ethers";
 
-import { BytesLike, ParamType , AbiCoder} from "ethers";
 import { Submission } from "./submission";
 
 export enum Flag {
@@ -50,12 +50,14 @@ export class Flags {
 
   public getFlags(): Flag[] {
     const ret: Flag[] = [];
-    Object.keys(Flag).filter((v) => isNaN(Number(v))).forEach((fl) => {
-      const flag = Flag[fl as keyof typeof Flag];
-      if (this.isSet(flag)) {
-        ret.push(flag);
-      }
-    });
+    Object.keys(Flag)
+      .filter((v) => isNaN(Number(v)))
+      .forEach((fl) => {
+        const flag = Flag[fl as keyof typeof Flag];
+        if (this.isSet(flag)) {
+          ret.push(flag);
+        }
+      });
     return ret;
   }
 
@@ -103,19 +105,16 @@ type TSendAutoParams = {
 export interface SendAutoParams extends TSendAutoParams {}
 export class SendAutoParams {
   static decode(data: string): SendAutoParams {
-    const [struct] = new AbiCoder().decode(
-      [SubmissionAutoParamsToParam],
-      data
-    );
+    const [struct] = new AbiCoder().decode([SubmissionAutoParamsToParam], data);
 
-      // Create a new object with named properties manually using the ParamType definition
-      const components = SubmissionAutoParamsToParam.components!;
-      const result: TSendAutoParams = <any>{};
+    // Create a new object with named properties manually using the ParamType definition
+    const components = SubmissionAutoParamsToParam.components!;
+    const result: TSendAutoParams = {} as any;
 
-      for (let i = 0; i < components.length; i++) {
-        const name = components[i].name;
-        Object.assign(result, { [name]: struct[i] });
-      }
+    for (let i = 0; i < components.length; i++) {
+      const name = components[i].name;
+      Object.assign(result, { [name]: struct[i] });
+    }
 
     return new SendAutoParams({
       ...result,
@@ -167,17 +166,17 @@ export class ClaimAutoParams {
   static decode(data: string): ClaimAutoParams {
     const [struct] = new AbiCoder().decode(
       [SubmissionAutoParamsFromParam],
-      data,
+      data
     );
 
-      // Create a new object with named properties manually using the ParamType definition
-      const components = SubmissionAutoParamsFromParam.components!;
-      const result: TClaimAutoParams = <any>{};
+    // Create a new object with named properties manually using the ParamType definition
+    const components = SubmissionAutoParamsFromParam.components!;
+    const result: TClaimAutoParams = {} as any;
 
-      for (let i = 0; i < components.length; i++) {
-        const name = components[i].name;
-        Object.assign(result, { [name]: struct[i] });
-      }
+    for (let i = 0; i < components.length; i++) {
+      const name = components[i].name;
+      Object.assign(result, { [name]: struct[i] });
+    }
 
     return new ClaimAutoParams({
       ...result,

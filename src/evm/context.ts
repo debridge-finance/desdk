@@ -1,8 +1,9 @@
+import "@nomicfoundation/hardhat-toolbox";
 import { ethers } from "ethers";
-import "@nomicfoundation/hardhat-toolbox"
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+
 import { DeBridgeApiSignatureStorage, ISignatureStorage } from "./connectors";
 import { DeBridgeGate, DeBridgeGate__factory } from "./typechain";
-import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 export const DEFAULT_DEBRIDGE_GATE_ADDRESS =
   "0x43dE2d77BF8027e25dBD179B491e8d64f38398aA";

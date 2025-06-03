@@ -60,12 +60,16 @@ async function deployContracts(
   );
   const incrementor = await Incrementor.deploy(
     gate.getAddress(),
-    (await hre.ethers.provider.getNetwork()).chainId,
+    (
+      await hre.ethers.provider.getNetwork()
+    ).chainId,
     counter.getAddress()
   );
 
   await counter.addChainSupport(
-    (await hre.ethers.provider.getNetwork()).chainId,
+    (
+      await hre.ethers.provider.getNetwork()
+    ).chainId,
     await incrementor.getAddress()
   );
 
@@ -96,15 +100,14 @@ describe("EVM: Send", function () {
       const executionFee = parseEther("0.1");
 
       const [, receiver] = await hre.ethers.getSigners();
-      const receiverBalanceBefore = await hre.ethers.provider.getBalance(receiver.getAddress());
-      // take 10bps and exfee
-      const expectedAmountAfterBridge = transferAmount
-        *(10000n - 10n)
-        /(10000n)
-        -(executionFee);
-      const expectedReceiverBalanceAfter = receiverBalanceBefore +(
-        expectedAmountAfterBridge
+      const receiverBalanceBefore = await hre.ethers.provider.getBalance(
+        receiver.getAddress()
       );
+      // take 10bps and exfee
+      const expectedAmountAfterBridge =
+        (transferAmount * (10000n - 10n)) / 10000n - executionFee;
+      const expectedReceiverBalanceAfter =
+        receiverBalanceBefore + expectedAmountAfterBridge;
 
       const message = new Message({
         tokenAddress: ethers.ZeroAddress,
@@ -121,7 +124,7 @@ describe("EVM: Send", function () {
 
       const txSend = await this.contracts.gate.send(
         ...message.getEncodedArgs(),
-        { value: transferAmount + (fee) }
+        { value: transferAmount + fee }
       );
       const txReceipt = await txSend.wait();
 
@@ -141,10 +144,10 @@ describe("EVM: Send", function () {
       const claimArgs = await claim.getEncodedArgs();
       await this.contracts.gate.claim(...claimArgs);
 
-      const receiverAmountAfter = await hre.ethers.provider.getBalance(receiver.getAddress());
-      expect(receiverAmountAfter).to.equal(
-        expectedReceiverBalanceAfter
+      const receiverAmountAfter = await hre.ethers.provider.getBalance(
+        receiver.getAddress()
       );
+      expect(receiverAmountAfter).to.equal(expectedReceiverBalanceAfter);
     });
 
     it("Should transfer raw value without auto params", async function () {
@@ -161,12 +164,10 @@ describe("EVM: Send", function () {
       const receiverBalanceBefore = await weth.balanceOf(receiver.address);
 
       // take 10bps
-      const expectedAmountAfterBridge = transferAmount
-        *(10000n - 10n)
-        /(10000n);
-      const expectedReceiverBalanceAfter = receiverBalanceBefore + (
-        expectedAmountAfterBridge
-      );
+      const expectedAmountAfterBridge =
+        (transferAmount * (10000n - 10n)) / 10000n;
+      const expectedReceiverBalanceAfter =
+        receiverBalanceBefore + expectedAmountAfterBridge;
 
       const message = new Message({
         tokenAddress: ethers.ZeroAddress,
@@ -178,7 +179,7 @@ describe("EVM: Send", function () {
 
       const txSend = await this.contracts.gate.send(
         ...message.getEncodedArgs(),
-        { value: transferAmount + (fee) }
+        { value: transferAmount + fee }
       );
       const txReceipt = await txSend.wait();
 
@@ -198,7 +199,7 @@ describe("EVM: Send", function () {
       await this.contracts.gate.claim(...claimArgs);
 
       const receiverAmountAfter = await weth.balanceOf(receiver.address);
-      expect(receiverAmountAfter === (expectedReceiverBalanceAfter)).to.equal(
+      expect(receiverAmountAfter === expectedReceiverBalanceAfter).to.equal(
         true
       );
     });
@@ -224,10 +225,7 @@ describe("EVM: General flow", function () {
   });
 
   it("Must capture one submission", async function () {
-    const submissions = await Submission.findAll(
-      this.tx.hash,
-      this.evmContext
-    );
+    const submissions = await Submission.findAll(this.tx.hash, this.evmContext);
 
     expect(submissions.length).to.be.eq(1);
 
@@ -279,19 +277,14 @@ describe("EVM: General flow: multiple submissions per one txn", function () {
   });
 
   it("Must capture multiple submissions", async function () {
-    this.submissions = await Submission.findAll(
-      this.tx.hash,
-      this.evmContext
-    );
+    this.submissions = await Submission.findAll(this.tx.hash, this.evmContext);
 
     expect(this.submissions.length).to.be.eq(3);
   });
 
   for (let i = 0; i < 3; i++) {
     it(`Must claim #${i + 1}`, async function () {
-      const preCounterValue = Number(
-        await this.contracts.counter.counter()
-      );
+      const preCounterValue = Number(await this.contracts.counter.counter());
 
       const claim = await this.submissions[i].toEVMClaim(this.evmContext);
       const args = await claim.getEncodedArgs();

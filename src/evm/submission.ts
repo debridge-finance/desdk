@@ -1,4 +1,5 @@
 import { EventLog } from "ethers";
+
 import { Claim } from "./claim";
 import { Context, getDeBridgeGateAddress, getProvider } from "./context";
 import { SendAutoParams } from "./structs";
@@ -12,7 +13,10 @@ export enum SubmissionStatus {
 }
 
 export type TSubmission = Readonly<
-  Omit<SentEvent.OutputObject, "amount" | "nonce" | "chainIdTo" | "autoParams"> & {
+  Omit<
+    SentEvent.OutputObject,
+    "amount" | "nonce" | "chainIdTo" | "autoParams"
+  > & {
     amount: string;
     nonce: string;
     chainIdTo: string;
@@ -87,7 +91,7 @@ export class Submission {
   }
 
   private async _getRequiredConfirmations(): Promise<number> {
-    const {chainId} = (await getProvider(this.ctx).getNetwork());
+    const { chainId } = await getProvider(this.ctx).getNetwork();
     if (chainId === 137n) return 256;
     else return 12;
   }
@@ -127,11 +131,11 @@ async function getSentEvents(
     provider
   );
 
-  return <any>txReceipt.logs
+  return txReceipt.logs
     .map((log) => {
-        const logDescription = contract.interface.parseLog(log);
-        if (logDescription?.name === 'Sent')
-          return new EventLog(log, contract.interface, logDescription.fragment);
+      const logDescription = contract.interface.parseLog(log);
+      if (logDescription?.name === "Sent")
+        return new EventLog(log, contract.interface, logDescription.fragment);
     })
-    .filter((log) => log !== undefined)
+    .filter((log) => log !== undefined) as any;
 }

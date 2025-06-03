@@ -1,4 +1,4 @@
-import { BigNumberish,  } from "ethers";
+import { BigNumberish } from "ethers";
 import hre from "hardhat";
 
 import {
@@ -13,7 +13,7 @@ function getRandom(min: number, max: number, decimals = 18) {
   max *= 10 ** denominator;
   decimals -= denominator;
   const v = Math.floor(Math.random() * (max - min + 1) + min);
-  return 10n ** BigInt(decimals) / BigInt( v )
+  return 10n ** BigInt(decimals) / BigInt(v);
 }
 
 export interface DeBridgeGateOpts {
@@ -34,16 +34,19 @@ export async function deployGate(
     "DeBridgeGate"
   );
 
-  const deBridgeGate: DeBridgeGate = <any>(await hre.upgrades.deployProxy(DeBridgeGateFactory, [
-    0,
-    await weth.getAddress(),
-  ], { unsafeAllow: ['missing-initializer-call'] }));
+  const deBridgeGate: DeBridgeGate = <any>(
+    await hre.upgrades.deployProxy(
+      DeBridgeGateFactory,
+      [0, await weth.getAddress()],
+      { unsafeAllow: ["missing-initializer-call"] }
+    )
+  );
 
   // setup callproxy
   const CallProxyFactory = await hre.ethers.getContractFactory("CallProxy");
-  const callProxy: CallProxy = <any>(await hre.upgrades.deployProxy(
-    CallProxyFactory
-  )) ;
+  const callProxy: CallProxy = <any>(
+    await hre.upgrades.deployProxy(CallProxyFactory)
+  );
 
   await callProxy.grantRole(
     await callProxy.DEBRIDGE_GATE_ROLE(),
@@ -59,12 +62,12 @@ export async function deployGate(
       "No validators provided. Please provide at least one validator to deploy the SignatureVerifier."
     );
   } else {
-    verifier = <any>(await hre.upgrades.deployProxy(Verifier, [
+    verifier = <any>await hre.upgrades.deployProxy(Verifier, [
       opts.validators!.length / 2 + 1, // uint8 _minConfirmations,
       1, // uint8 _confirmationThreshold,
       opts.validators!.length - 2, // uint8 _excessConfirmations,
       await deBridgeGate.getAddress(), // address _debridgeAddress
-    ])) ;
+    ]);
 
     const validatorAddresses = await Promise.all(
       opts.validators.map((signer) => signer.getAddress())
@@ -79,17 +82,9 @@ export async function deployGate(
   await deBridgeGate.setSignatureVerifier(verifier!.getAddress());
 
   // setup chain support (loopback)
-    const chainId = await hre.ethers.provider.send("eth_chainId", []);
-  await deBridgeGate.setChainSupport(
-    chainId,
-    true,
-    false
-  );
-  await deBridgeGate.setChainSupport(
-  chainId,
-    true,
-    true
-  );
+  const chainId = await hre.ethers.provider.send("eth_chainId", []);
+  await deBridgeGate.setChainSupport(chainId, true, false);
+  await deBridgeGate.setChainSupport(chainId, true, true);
 
   await deBridgeGate.updateGlobalFee(
     opts.fixedFee || getRandom(0.001, 0.5, 18), // globalFixedNativeFee

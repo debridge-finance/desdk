@@ -45,7 +45,7 @@ export class Claim {
     const excessConfirmations = await getDeBridgeGate(
       this.ctx
     ).excessConfirmations();
-    return Number(excessConfirmations)
+    return Number(excessConfirmations);
   }
 
   async isSigned(): Promise<boolean> {
