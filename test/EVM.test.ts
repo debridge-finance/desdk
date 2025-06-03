@@ -90,7 +90,7 @@ describe("EVM: Send", function () {
       this.evmContext = {
         provider: hre,
         deBridgeGateAddress: await this.contracts.gate.getAddress(),
-        signatureStorage: new SignersSignatureStorage(this.validators),
+        signatureStorage: new SignersSignatureStorage(<any>this.validators),
       };
     });
 
@@ -216,7 +216,7 @@ describe("EVM: General flow", function () {
     this.evmContext = {
       provider: hre,
       deBridgeGateAddress: await this.contracts.gate.getAddress(),
-      signatureStorage: new SignersSignatureStorage(this.validators),
+      signatureStorage: new SignersSignatureStorage(<any>this.validators),
     };
     const tx = await this.contracts.incrementor.increment(INCREMENT_BY, {
       value: this.contracts.gateProtocolFee,
@@ -265,7 +265,7 @@ describe("EVM: General flow: multiple submissions per one txn", function () {
     this.evmContext = {
       provider: hre,
       deBridgeGateAddress: await this.contracts.gate.getAddress(),
-      signatureStorage: new SignersSignatureStorage(this.validators),
+      signatureStorage: new SignersSignatureStorage(<any>this.validators),
     };
     const tx = await this.contracts.incrementor.incrementMulti(
       [INCREMENT_BY, INCREMENT_BY * 2, INCREMENT_BY * 3],

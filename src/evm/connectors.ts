@@ -27,7 +27,7 @@ export interface ISignatureStorage {
 }
 
 export class DummySignatureStorage implements ISignatureStorage {
-  async getSignatures(submissionId: BytesLike) {
+  async getSignatures() {
     return ["0x1", "0x2", "0x3", "0x4", "0x5", "0x6", "0x7", "0x8"];
   }
 }
@@ -35,12 +35,12 @@ export class DummySignatureStorage implements ISignatureStorage {
 export class FixedSignatureStorage implements ISignatureStorage {
   constructor(private _signatures: string[]) {}
 
-  async getSignatures(submissionId: BytesLike) {
+  async getSignatures() {
     return this._signatures;
   }
 }
 export class SignersSignatureStorage implements ISignatureStorage {
-  constructor(private _signers: any[]) {}
+  constructor(private _signers: ethers.Signer[]) {}
 
   async getSignatures(submissionId: BytesLike): Promise<string[]> {
     const signatures = [];
@@ -49,7 +49,19 @@ export class SignersSignatureStorage implements ISignatureStorage {
     // submissionId is a string (0x12[...]), but we must sign the bytes
     const bytesToSign = ethers.getBytes(submissionId);
 
-    for (const signer of this._signers) {
+    // Sort signers by their addresses to ensure consistent order
+    const sortedSigners = await Promise.all(
+      this._signers.map(async (signer) => ({
+        signer,
+        address: await signer.getAddress(),
+      }))
+    );
+    sortedSigners.sort((a, b) =>
+      BigInt(a.address) < BigInt(b.address) ? -1 : 1
+    );
+
+    // Collect signatures from sorted signers
+    for (const { signer } of sortedSigners) {
       const signature = await signer.signMessage(bytesToSign);
       signatures.push(signature);
     }
@@ -59,7 +71,7 @@ export class SignersSignatureStorage implements ISignatureStorage {
 }
 
 export class IPFSSignatureStorage implements ISignatureStorage {
-  async getSignatures(submissionId: BytesLike) {
+  async getSignatures() {
     throw new Error("IPFSSignatureStorage not implemented");
     return [];
   }

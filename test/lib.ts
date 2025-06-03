@@ -64,8 +64,6 @@ export async function deployGate(
   } else {
     verifier = <any>await hre.upgrades.deployProxy(Verifier, [
       opts.validators!.length / 2 + 1, // uint8 _minConfirmations,
-      1, // uint8 _confirmationThreshold,
-      opts.validators!.length - 2, // uint8 _excessConfirmations,
       await deBridgeGate.getAddress(), // address _debridgeAddress
     ]);
 

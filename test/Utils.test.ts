@@ -53,7 +53,7 @@ describe("Signature storage", function () {
 
   it("SignersSignatureStorage", async function () {
     const signers = (await ethers.getSigners()).slice(0, 12);
-    const storage = new SignersSignatureStorage(signers);
+    const storage = new SignersSignatureStorage(<any>signers);
     const testCase = TEST_ACCOUNTS_SIGNATURES;
     const signatures = await storage.getSignatures(testCase.submissionId);
     expect(signatures).to.have.all.members(testCase.signatures);
