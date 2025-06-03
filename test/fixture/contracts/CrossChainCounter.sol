@@ -2,20 +2,14 @@
 pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@debridge-finance/contracts/contracts/interfaces/IDeBridgeGate.sol";
-import "@debridge-finance/contracts/contracts/interfaces/ICallProxy.sol";
+import "./debridge/interfaces/IDeBridgeGate.sol";
+import "./debridge/interfaces/ICallProxy.sol";
 
 import "./interfaces/ICrossChainCounter.sol";
 
-/// @notice IDeBridgeGate interface doesn't contain a getter for the `callProxy` public variable, which is
-///         defined in the `DeBridgeGate` contract, so we create a dummy interface solely for this getter
-interface IDebridgeGateWithCallProxyGetter is IDeBridgeGate {
-    function callProxy() external returns (address);
-}
-
 contract CrossChainCounter is AccessControl, ICrossChainCounter {
     /// @dev DeBridgeGate's address on the current chain
-    IDebridgeGateWithCallProxyGetter public deBridgeGate;
+    IDeBridgeGate public deBridgeGate;
 
     /// @dev chains, where commands are allowed to come from
     /// @dev chain_id_from => ChainInfo
@@ -62,7 +56,7 @@ contract CrossChainCounter is AccessControl, ICrossChainCounter {
 
     /* ========== INITIALIZERS ========== */
 
-    constructor(IDebridgeGateWithCallProxyGetter deBridgeGate_) {
+    constructor(IDeBridgeGate deBridgeGate_) {
         deBridgeGate = deBridgeGate_;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }

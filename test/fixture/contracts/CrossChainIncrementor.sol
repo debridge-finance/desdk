@@ -1,18 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
-import "@debridge-finance/contracts/contracts/libraries/Flags.sol";
-import "@debridge-finance/contracts/contracts/interfaces/IDeBridgeGate.sol";
+import "./debridge/libraries/Flags.sol";
+import "./debridge/interfaces/IDeBridgeGate.sol";
 
 import "./interfaces/ICrossChainCounter.sol";
 
-interface IDeBridgeGateExtended is IDeBridgeGate {
-    function globalFixedNativeFee() external returns (uint);
-}
-
 contract CrossChainIncrementor {
     /// @dev DeBridgeGate's address on the current chain
-    IDeBridgeGateExtended public deBridgeGate;
+    IDeBridgeGate public deBridgeGate;
 
     /// @dev Chain ID where the cross-chain counter contract has been deployed
     uint256 crossChainCounterResidenceChainID;
@@ -23,7 +19,7 @@ contract CrossChainIncrementor {
     /* ========== INITIALIZERS ========== */
 
     constructor(
-        IDeBridgeGateExtended deBridgeGate_,
+        IDeBridgeGate deBridgeGate_,
         uint256 crossChainCounterResidenceChainID_,
         address crossChainCounterResidenceAddress_
     ) {

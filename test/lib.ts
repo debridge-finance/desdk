@@ -37,7 +37,7 @@ export async function deployGate(
   const deBridgeGate: DeBridgeGate = <any>(
     await hre.upgrades.deployProxy(
       DeBridgeGateFactory,
-      [0, await weth.getAddress()],
+      [0, await weth.getAddress(), 0],
       { unsafeAllow: ["missing-initializer-call"] }
     )
   );
