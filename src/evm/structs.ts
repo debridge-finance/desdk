@@ -1,4 +1,4 @@
-import { BytesLike, defaultAbiCoder, ParamType } from "ethers/lib/utils";
+import { AbiCoder, BytesLike, ParamType } from "ethers";
 
 import { Submission } from "./submission";
 
@@ -50,12 +50,14 @@ export class Flags {
 
   public getFlags(): Flag[] {
     const ret: Flag[] = [];
-    Object.keys(Flag).filter((v) => isNaN(Number(v))).forEach((fl) => {
-      const flag = Flag[fl as keyof typeof Flag];
-      if (this.isSet(flag)) {
-        ret.push(flag);
-      }
-    });
+    Object.keys(Flag)
+      .filter((v) => isNaN(Number(v)))
+      .forEach((fl) => {
+        const flag = Flag[fl as keyof typeof Flag];
+        if (this.isSet(flag)) {
+          ret.push(flag);
+        }
+      });
     return ret;
   }
 
@@ -93,7 +95,7 @@ export const SubmissionAutoParamsFromParam = ParamType.from({
 });
 
 type TSendAutoParams = {
-  readonly executionFee: string;
+  readonly executionFee: bigint;
   readonly flags: Flags;
   readonly fallbackAddress: string;
   readonly data: string;
@@ -103,14 +105,20 @@ type TSendAutoParams = {
 export interface SendAutoParams extends TSendAutoParams {}
 export class SendAutoParams {
   static decode(data: string): SendAutoParams {
-    const struct = defaultAbiCoder.decode(
-      [SubmissionAutoParamsToParam],
-      data
-    )[0];
+    const [struct] = new AbiCoder().decode([SubmissionAutoParamsToParam], data);
+
+    // Create a new object with named properties manually using the ParamType definition
+    const components = SubmissionAutoParamsToParam.components!;
+    const result: TSendAutoParams = {} as any;
+
+    for (let i = 0; i < components.length; i++) {
+      const name = components[i].name;
+      Object.assign(result, { [name]: struct[i] });
+    }
 
     return new SendAutoParams({
-      ...struct,
-      flags: Flags.decode(struct.flags.toNumber()),
+      ...result,
+      flags: Flags.decode(Number(result.flags)),
     });
   }
 
@@ -123,7 +131,7 @@ export class SendAutoParams {
   }
 
   encode(): string {
-    return defaultAbiCoder.encode(
+    return new AbiCoder().encode(
       [SubmissionAutoParamsToParam],
       [
         [
@@ -145,7 +153,7 @@ export class SendAutoParams {
 }
 
 type TClaimAutoParams = {
-  readonly executionFee: string;
+  readonly executionFee: bigint;
   readonly flags: Flags;
   readonly fallbackAddress: BytesLike;
   readonly data: BytesLike;
@@ -156,14 +164,23 @@ type TClaimAutoParams = {
 export interface ClaimAutoParams extends TClaimAutoParams {}
 export class ClaimAutoParams {
   static decode(data: string): ClaimAutoParams {
-    const struct = defaultAbiCoder.decode(
+    const [struct] = new AbiCoder().decode(
       [SubmissionAutoParamsFromParam],
       data
-    )[0];
+    );
+
+    // Create a new object with named properties manually using the ParamType definition
+    const components = SubmissionAutoParamsFromParam.components!;
+    const result: TClaimAutoParams = {} as any;
+
+    for (let i = 0; i < components.length; i++) {
+      const name = components[i].name;
+      Object.assign(result, { [name]: struct[i] });
+    }
 
     return new ClaimAutoParams({
-      ...struct,
-      flags: Flags.decode(struct.flags.toNumber()),
+      ...result,
+      flags: Flags.decode(Number(result.flags)),
     });
   }
 
@@ -176,7 +193,7 @@ export class ClaimAutoParams {
   }
 
   encode(): string {
-    return defaultAbiCoder.encode(
+    return new AbiCoder().encode(
       [SubmissionAutoParamsFromParam],
       [
         [

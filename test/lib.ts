@@ -1,5 +1,4 @@
-import { deployMockContract } from "ethereum-waffle";
-import { BigNumber, BigNumberish, ethers } from "ethers";
+import { BigNumberish } from "ethers";
 import hre from "hardhat";
 
 import {
@@ -14,11 +13,11 @@ function getRandom(min: number, max: number, decimals = 18) {
   max *= 10 ** denominator;
   decimals -= denominator;
   const v = Math.floor(Math.random() * (max - min + 1) + min);
-  return BigNumber.from("10").pow(decimals).mul(v);
+  return 10n ** BigInt(decimals) / BigInt(v);
 }
 
 export interface DeBridgeGateOpts {
-  validators?: ethers.Signer[];
+  validators?: Awaited<ReturnType<typeof hre.ethers.getSigners>>;
   fixedFee?: BigNumberish;
 }
 
@@ -35,40 +34,38 @@ export async function deployGate(
     "DeBridgeGate"
   );
 
-  const deBridgeGate = (await hre.upgrades.deployProxy(DeBridgeGateFactory, [
-    0,
-    weth.address,
-  ])) as DeBridgeGate;
-  await deBridgeGate.deployed();
+  const deBridgeGate: DeBridgeGate = <any>(
+    await hre.upgrades.deployProxy(
+      DeBridgeGateFactory,
+      [0, await weth.getAddress(), 0],
+      { unsafeAllow: ["missing-initializer-call"] }
+    )
+  );
 
   // setup callproxy
   const CallProxyFactory = await hre.ethers.getContractFactory("CallProxy");
-  const callProxy = (await hre.upgrades.deployProxy(
-    CallProxyFactory
-  )) as CallProxy;
-  await callProxy.deployed();
+  const callProxy: CallProxy = <any>(
+    await hre.upgrades.deployProxy(CallProxyFactory)
+  );
 
   await callProxy.grantRole(
     await callProxy.DEBRIDGE_GATE_ROLE(),
-    deBridgeGate.address
+    deBridgeGate.getAddress()
   );
-  await deBridgeGate.setCallProxy(callProxy.address);
+  await deBridgeGate.setCallProxy(callProxy.getAddress());
 
   // setup signature verifier
   const Verifier = await hre.ethers.getContractFactory("SignatureVerifier");
-  let verifier;
+  let verifier: SignatureVerifier;
   if (opts.validators!.length === 0) {
-    verifier = await deployMockContract((await hre.ethers.getSigners())[0], [
-      ...Verifier.interface.fragments,
-    ]);
-    await verifier.mock.submit.returns();
+    throw new Error(
+      "No validators provided. Please provide at least one validator to deploy the SignatureVerifier."
+    );
   } else {
-    verifier = (await hre.upgrades.deployProxy(Verifier, [
+    verifier = <any>await hre.upgrades.deployProxy(Verifier, [
       opts.validators!.length / 2 + 1, // uint8 _minConfirmations,
-      1, // uint8 _confirmationThreshold,
-      opts.validators!.length - 2, // uint8 _excessConfirmations,
-      deBridgeGate.address, // address _debridgeAddress
-    ])) as SignatureVerifier;
+      await deBridgeGate.getAddress(), // address _debridgeAddress
+    ]);
 
     const validatorAddresses = await Promise.all(
       opts.validators.map((signer) => signer.getAddress())
@@ -80,19 +77,12 @@ export async function deployGate(
     );
   }
 
-  await deBridgeGate.setSignatureVerifier(verifier.address);
+  await deBridgeGate.setSignatureVerifier(verifier!.getAddress());
 
   // setup chain support (loopback)
-  await deBridgeGate.setChainSupport(
-    hre.ethers.provider.network.chainId,
-    true,
-    false
-  );
-  await deBridgeGate.setChainSupport(
-    hre.ethers.provider.network.chainId,
-    true,
-    true
-  );
+  const chainId = await hre.ethers.provider.send("eth_chainId", []);
+  await deBridgeGate.setChainSupport(chainId, true, false);
+  await deBridgeGate.setChainSupport(chainId, true, true);
 
   await deBridgeGate.updateGlobalFee(
     opts.fixedFee || getRandom(0.001, 0.5, 18), // globalFixedNativeFee

@@ -17,11 +17,16 @@
   "scripts": {
     "lint:fix": "prettier --write 'src/**/*.{js,ts}' 'test/**/*.{js,ts}' && tslint --fix --config tslint.json --project tsconfig.json",
     "lint": "tslint --config tslint.json --project tsconfig.json",
+    "pretest": "npm-run-all test:clean build test:build",
+    "test:clean":  "cd test/fixture && hardhat clean",
+    "test:build":  "cd test/fixture && hardhat compile",
     "test": "mocha --exit --recursive 'test/**/*.test.ts'",
-    "clean": "rm -rf build",
+    "clean": "npm run test:clean && npm run build:clean",
     "build-cjs": "tsc --build tsconfig.json",
     "build-esm": "tsc --build tsconfig-esm.json",
-    "build": "npm-run-all clean build-*",
+    "prebuild": "npm-run-all build:clean && hardhat compile",
+    "build": "npm-run-all build-*",
+    "build:clean": "rm -rf build && hardhat clean",
     "prepublishOnly": "npm run build",
     "prepare": "npm run build"
   },
@@ -32,31 +37,21 @@
     "README.md"
   ],
   "devDependencies": {
-    "@debridge-finance/contracts": "github:debridge-finance/debridge-contracts-v1#8c6f3845288d8e0596fb2700beb2ee2725d802fb",
-    "@nomiclabs/hardhat-ethers": "^2.0.6",
-    "@nomiclabs/hardhat-waffle": "^2.0.3",
-    "@openzeppelin/hardhat-upgrades": "^1.19.1",
-    "@typechain/ethers-v5": "^10.1.0",
-    "@typechain/hardhat": "^6.1.2",
-    "@types/chai": "^4.3.1",
-    "@types/mocha": "^9.1.1",
-    "@types/node": "^18.6.2",
-    "chai": "^4.3.6",
-    "ethereum-waffle": "^3.4.4",
-    "hardhat": "^2.10.1",
+    "@openzeppelin/contracts": "4.8.2",
+    "@openzeppelin/contracts-upgradeable": "4.8.2",
+    "@nomicfoundation/hardhat-toolbox": "5.0.0",
+    "@openzeppelin/hardhat-upgrades": "3.6.0",
     "npm-run-all": "^4.1.5",
     "prettier": "2.7.1",
     "ts-node": "^10.9.1",
     "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.3.0",
-    "typescript": ">=4.3.0"
+    "typescript": "^5.8.0"
   },
   "dependencies": {
-    "@ethersproject/abi": "^5.0.0",
-    "@ethersproject/bytes": "^5.0.0",
-    "@ethersproject/providers": "^5.0.0",
-    "ethers": "^5.1.3"
   },
-  "peerDependencies": {}
+  "peerDependencies": {
+    "ethers": "^6.11.1"
+  }
 }

@@ -1,13 +1,10 @@
-import { deepCopy } from "ethers/lib/utils";
+import { EventLog } from "ethers";
 
 import { Claim } from "./claim";
 import { Context, getDeBridgeGateAddress, getProvider } from "./context";
 import { SendAutoParams } from "./structs";
 import { DeBridgeGate__factory } from "./typechain";
-import {
-  SentEvent,
-  SentEventObject,
-} from "./typechain/@debridge-finance/contracts/contracts/interfaces/IDeBridgeGate";
+import { SentEvent } from "./typechain/contracts/interfaces/IDeBridgeGate";
 
 export enum SubmissionStatus {
   WAITING_CONFIRMATION,
@@ -16,14 +13,17 @@ export enum SubmissionStatus {
 }
 
 export type TSubmission = Readonly<
-  Omit<SentEventObject, "amount" | "nonce" | "chainIdTo" | "autoParams"> & {
+  Omit<
+    SentEvent.OutputObject,
+    "amount" | "nonce" | "chainIdTo" | "autoParams"
+  > & {
     amount: string;
     nonce: string;
     chainIdTo: string;
     autoParams?: SendAutoParams;
 
     originChainId: number;
-    sentEvent: SentEvent;
+    sentEvent: SentEvent.Log;
   }
 >;
 
@@ -32,9 +32,9 @@ export interface Submission extends TSubmission {}
 export class Submission {
   static async findAll(txHash: string, ctx: Context): Promise<Submission[]> {
     const events = await getSentEvents(txHash, ctx);
-    const originChainId = (await getProvider(ctx).getNetwork()).chainId;
+    const originChainId = Number((await getProvider(ctx).getNetwork()).chainId);
     return events.map(
-      (sentEvent: SentEvent) =>
+      (sentEvent) =>
         new Submission(
           {
             submissionId: sentEvent.args.submissionId.toString(),
@@ -91,8 +91,8 @@ export class Submission {
   }
 
   private async _getRequiredConfirmations(): Promise<number> {
-    const network = await getProvider(this.ctx).getNetwork();
-    if (network.chainId === 137) return 256;
+    const { chainId } = await getProvider(this.ctx).getNetwork();
+    if (chainId === 137n) return 256;
     else return 12;
   }
 
@@ -121,7 +121,7 @@ export class Submission {
 async function getSentEvents(
   txHash: string,
   opts: Context
-): Promise<SentEvent[]> {
+): Promise<SentEvent.Log[]> {
   const provider = getProvider(opts);
   const txReceipt = await provider.getTransactionReceipt(txHash);
   if (!txReceipt) return [];
@@ -133,29 +133,9 @@ async function getSentEvents(
 
   return txReceipt.logs
     .map((log) => {
-      try {
-        const logDescription = contract.interface.parseLog(log);
-        return {
-          ...log,
-          ...logDescription,
-        };
-      } catch (e) {}
+      const logDescription = contract.interface.parseLog(log);
+      if (logDescription?.name === "Sent")
+        return new EventLog(log, contract.interface, logDescription.fragment);
     })
-    .filter((log) => log !== undefined)
-    .filter((log) => log!.name === "Sent")
-    .map((log) => {
-      // this is an ugly copypasta from the ethers.js' Contract._wrapEvent method
-      // until Contract.queryTransaction() is implemented (https://github.com/ethers-io/ethers.js/discussions/2895)
-      const event = deepCopy(log! as unknown) as SentEvent;
-      event.getBlock = () => {
-        return provider.getBlock(txReceipt.blockHash);
-      };
-      event.getTransaction = () => {
-        return provider.getTransaction(txReceipt.transactionHash);
-      };
-      event.getTransactionReceipt = () => {
-        return Promise.resolve(txReceipt);
-      };
-      return event;
-    });
+    .filter((log) => log !== undefined) as any;
 }

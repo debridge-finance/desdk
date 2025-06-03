@@ -6,7 +6,7 @@ import {
 } from "./context";
 import { ClaimAutoParams } from "./structs";
 import { SignatureVerifier__factory } from "./typechain";
-import { ClaimedEventObject } from "./typechain/@debridge-finance/contracts/contracts/interfaces/IDeBridgeGate";
+import { ClaimedEvent } from "./typechain/contracts/interfaces/IDeBridgeGate";
 
 export type ClaimArgs = [
   string,
@@ -20,7 +20,7 @@ export type ClaimArgs = [
 
 export type TClaim = Readonly<
   Omit<
-    ClaimedEventObject,
+    ClaimedEvent.OutputObject,
     "amount" | "nonce" | "chainIdFrom" | "autoParams" | "isNativeToken"
   > & {
     readonly debridgeId: string;
@@ -45,12 +45,7 @@ export class Claim {
     const excessConfirmations = await getDeBridgeGate(
       this.ctx
     ).excessConfirmations();
-    const sv = SignatureVerifier__factory.connect(
-      await contract.signatureVerifier(),
-      getProvider(this.ctx)
-    );
-    const activityExcessConfirmations = await sv.excessConfirmations();
-    return Math.max(excessConfirmations, activityExcessConfirmations);
+    return Number(excessConfirmations);
   }
 
   async isSigned(): Promise<boolean> {
