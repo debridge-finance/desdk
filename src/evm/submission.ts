@@ -3,7 +3,7 @@ import { Claim } from "./claim";
 import { Context, getDeBridgeGateAddress, getProvider } from "./context";
 import { SendAutoParams } from "./structs";
 import { DeBridgeGate__factory } from "./typechain";
-import { SentEvent } from "./typechain/@debridge-finance/contracts/contracts/interfaces/IDeBridgeGate";
+import { SentEvent } from "./typechain/contracts/interfaces/IDeBridgeGate";
 
 export enum SubmissionStatus {
   WAITING_CONFIRMATION,
