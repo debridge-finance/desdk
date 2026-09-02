@@ -42,7 +42,7 @@
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.6.2",
     "chai": "^4.3.6",
-    "ethereum-waffle": "^3.4.4",
+    "ethereum-waffle": "^4.0.10",
     "hardhat": "^2.10.1",
     "npm-run-all": "^4.1.5",
     "prettier": "2.7.1",
